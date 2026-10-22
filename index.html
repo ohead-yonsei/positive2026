@@ -180,6 +180,15 @@ input{width:100%;font:inherit;font-size:16px;color:var(--paper-ink);background:#
 .sendlist li:first-child{border-top:0}
 .sendlist .btn{margin:0}
 .sendlist .done{color:#2F7A3B}
+select{width:100%;font:inherit;font-size:16px;color:var(--paper-ink);background:#fff;border:3px solid var(--line);border-radius:12px;padding:10px 12px}
+.regchips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0;padding:0;list-style:none}
+.regchips li{font-family:var(--kr);font-size:14px;padding:2px 10px 0;border-radius:999px;border:2px dashed #C9B9A8;color:var(--paper-soft)}
+.regchips li.got{border-style:solid;border-color:var(--line);background:var(--slime);color:var(--paper-ink)}
+.progress{font-family:var(--kr);font-size:16px;margin:10px 0 0}
+.sync{font-size:14px;color:var(--soft);margin:0 0 10px;min-height:1.2em}
+.sync.ok{color:var(--ink)}.sync.bad{color:var(--ink);font-weight:700}
+.nosrv{background:var(--paper);color:var(--paper-ink);border:3px dashed var(--line);border-radius:14px;padding:10px 14px;font-size:15px}
+.addrow select{flex:1;min-width:0}
 .note{font-size:14px;color:var(--paper-soft);margin:16px 0 0}
 
 footer{text-align:center;padding:70px 20px 40px;color:var(--soft);font-size:14px}
@@ -217,7 +226,7 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
           <div class="trow"><dt>When</dt><dd>10.31 토 – 11.1 일<small>1박 2일, 할로윈 당일 밤</small></dd></div>
           <div class="trow"><dt>Where</dt><dd>돌기와토담집</dd></div>
           <div class="trow"><dt>Menu</dt><dd>BBQ 파티 🔥<small>야식은 랜덤 떡볶이</small></dd></div>
-          <div class="trow"><dt>Dress</dt><dd>올해 단체티<small>+ 할로윈 소품 하나쯤</small></dd></div>
+          <div class="trow"><dt>Dress</dt><dd>올해 단체티<small>운영진이 준비해둘게. 입구에서 받아서 갈아입기</small></dd></div>
         </dl>
       </div>
       <div class="ticket-stub"><span id="dday">D-?</span></div>
@@ -234,7 +243,7 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     <div class="sh"><h2>가져올 것</h2><span class="tag">Bring it!</span></div>
     <p class="lede">뭘 가져오는지는 당일까지 비밀. 공개는 현장에서 한 명씩.</p>
     <div class="bring">
-      <div class="sticker"><div class="ico" aria-hidden="true">👕</div><div><h3>단체티</h3><p>입고 오거나 챙겨 오기. 도착하면 술 들어가기 전에 단체사진부터.</p></div></div>
+      <div class="sticker"><div class="ico" aria-hidden="true">👕</div><div><h3>단체티는 안 챙겨도 돼</h3><p>운영진이 준비해둘게. <b>도착하면 입구에서 받아서 바로 갈아입기</b>. 술 들어가기 전에 단체사진부터.</p></div></div>
       <div class="sticker"><div class="ico" aria-hidden="true">🌶️</div><div><h3>떡볶이 부재료 아무거나 1개</h3><p>소스는 준비돼 있어. 상의 금지, <b>겹치면 겹치는 대로 그게 재미</b>. 어묵 몇 개 나올지 내기 환영.</p></div></div>
       <div class="sticker"><div class="ico" aria-hidden="true">🛍️</div><div><h3>다이소 이름 석 자 물품</h3><p>내 이름 글자 하나씩으로 시작하는 물건 3개. 삼행시처럼 소개하고 <b>제일 기발한 사람에게 상품</b>.</p></div></div>
     </div>
@@ -242,13 +251,15 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
 
   <section id="todo">
     <div class="sh"><h2>할 일</h2><span class="tag">To-do</span></div>
-    <p class="lede" id="todo-lede">누가 뭘 맡았는지 한눈에. 운영진이 이름을 넣어둘게.</p>
+    <p class="lede" id="todo-lede">하고 싶은 일에 내 이름을 넣어줘. 넣는 순간 자동으로 저장되고, 할 일도 추가할 수 있어.</p>
 
     <div class="pool-wrap" id="pool-wrap" hidden>
       <p class="pool-help" id="pool-help">이름을 할 일 카드로 끌어다 놓거나, 이름을 누른 다음 카드를 눌러줘. 한 사람이 여러 일을 맡아도 돼.</p>
       <div class="pool" id="pool"></div>
     </div>
 
+    <p class="nosrv" id="nosrv" hidden>아직 서버가 연결되지 않았어. 연결되면 여기서 바로 이름을 넣을 수 있어.</p>
+    <p class="sync" id="sync" aria-live="polite"></p>
     <div class="board" id="board"></div>
 
     <div class="addtask sticker" id="addtask" hidden>
@@ -260,17 +271,13 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     </div>
   </section>
 
-  <div class="savebar" id="savebar" hidden>
-    <span id="save-msg">바뀐 내용이 있어</span>
-    <span class="sb-btns"><button class="btn ghosty" id="copy-btn">복사</button><button class="btn" id="dl-btn">board.json 받기</button></span>
-  </div>
 
 
   <section id="night">
     <div class="sh"><h2>그날 밤 순서</h2><span class="tag">Tonight</span></div>
     <p class="lede">대충 이런 흐름. 분위기 따라 바뀔 수 있음.</p>
     <ol class="night sticker">
-      <li><div><b>도착 &amp; 단체사진</b><span>단체티 입고 기와집 앞에서</span></div></li>
+      <li><div><b>도착 &amp; 단체사진</b><span>입구에서 단체티로 갈아입고 기와집 앞에서 찰칵</span></div></li>
       <li><div><b>BBQ 파티</b><span>불 피우고 고기 굽기, 오늘의 메인</span></div></li>
       <li><div><b>다이소 이름 물품 발표회</b><span>한 명씩 세 글자 공개, 투표로 1등</span></div></li>
       <li><div><b>야식: 랜덤 떡볶이</b><span>부재료 하나씩 공개하면서 냄비에 투하</span></div></li>
@@ -288,22 +295,22 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     <div class="sticker mcard">
       <span class="bubble" id="b2" hidden>Boo!</span>
       <button class="ghost" data-bubble="b2" aria-label="유령 누르기"><svg><use href="#ghost"/></svg></button>
-
-      <div id="m-wait">
-        <h3 class="mh">내 마니또 확인</h3>
-        <p class="how">섞기 담당이 카톡으로 보내준 <b>개인 링크</b>를 누르면 여기서 바로 확인할 수 있어. 링크가 안 열리면 링크 맨 끝 # 뒤의 열쇠를 직접 입력해도 돼.</p>
-        <label for="m-key">열쇠</label>
-        <input id="m-key" placeholder="m 으로 시작하는 9글자" autocomplete="off" autocapitalize="off" spellcheck="false">
-        <button class="btn" id="m-key-go">확인하기</button>
-        <p class="msg" id="m-key-msg" aria-live="polite"></p>
+      <h3 class="mh">내 마니또</h3>
+      <p class="how">처음엔 이름을 고르고 비밀번호를 정해서 <b>등록</b>해줘. 11명이 다 등록하면 운영진이 매칭을 시작하고, 그다음부터 같은 이름과 비밀번호로 확인할 수 있어. 결과는 각자 비밀번호로 잠겨서 운영진도 못 봐.</p>
+      <ul class="regchips" id="mn-chips"></ul>
+      <p class="progress" id="mn-progress"></p>
+      <div id="mn-form">
+        <label for="mn-name">내 이름</label>
+        <select id="mn-name"></select>
+        <label for="mn-pw" id="mn-pwlabel">비밀번호</label>
+        <input id="mn-pw" type="password" autocomplete="off">
+        <div id="mn-pw2-wrap" hidden>
+          <label for="mn-pw2">비밀번호 한 번 더</label>
+          <input id="mn-pw2" type="password" autocomplete="off">
+        </div>
+        <button class="btn" id="mn-go">등록하기</button>
+        <p class="msg" id="mn-msg" aria-live="polite"></p>
       </div>
-
-      <div id="m-ready" hidden>
-        <h3 class="mh" id="m-hello"></h3>
-        <p class="how">주변에 보는 사람 없는지 확인하고 열어봐.</p>
-        <button class="btn" id="m-open">마니또 열어보기</button>
-      </div>
-
       <div id="m-show" hidden>
         <div class="reveal" id="r-card">
           <p>너의 마니또는</p>
@@ -315,14 +322,15 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     </div>
 
     <div id="m-admin" class="sticker admin" hidden>
-      <h3>섞기 담당 전용</h3>
-      <p>아무 숫자나 마음대로 입력하고 매칭하기를 누르면 11명이 섞여. 누가 누구인지는 화면에 안 나오고, 각자에게 보낼 개인 링크만 나와.</p>
-      <label for="a-seed">아무 숫자</label>
-      <input id="a-seed" inputmode="numeric" autocomplete="off" placeholder="비밀로 정한 숫자">
-      <button class="btn" id="a-go">매칭하기</button>
-      <p class="msg" id="a-msg" aria-live="polite"></p>
-      <ul class="sendlist" id="a-list"></ul>
-      <p class="note">링크를 누르면 그 사람 마니또가 보이니까 본인 것 말고는 열지 마. 매칭하기를 다시 누르면 새로 섞이니까, 마지막에 만든 링크만 보내줘.</p>
+      <h3>운영진 전용</h3>
+      <p>매칭을 시작해도 결과는 어디에도 표시되지 않아. 운영진도 누가 누구인지 볼 수 없어.</p>
+      <label for="ad-pw">운영진 비밀번호</label>
+      <input id="ad-pw" type="password" autocomplete="off">
+      <button class="btn" id="ad-start" disabled>매칭 시작</button>
+      <p class="msg" id="ad-msg" aria-live="polite"></p>
+      <label for="ad-who">비밀번호를 잊은 사람 초기화</label>
+      <div class="addrow"><select id="ad-who"></select><button class="btn ghosty" id="ad-reset">초기화</button></div>
+      <p class="note">초기화하면 그 사람은 다시 등록해야 하고, 매칭도 처음부터 다시 시작해야 해.</p>
     </div>
   </section>
 </main>
@@ -349,7 +357,7 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 })();
 
 /* Boo! ghosts */
-const BOOS=['Boo!','Boo! 놀랐지?','긍정 Boo!','Boo~ 떡볶이 뭐 가져와?','Boo! 단체티 챙겨!','Boo! 마니또 확인했어?','Booooo!'];
+const BOOS=['Boo!','Boo! 놀랐지?','긍정 Boo!','Boo~ 떡볶이 뭐 가져와?','Boo! 입구에서 단체티 받아!','Boo! 마니또 확인했어?','Booooo!'];
 let booN=0;
 document.querySelectorAll('.ghost').forEach(g=>g.addEventListener('click',()=>{
   const b=$(g.dataset.bubble);
@@ -361,148 +369,86 @@ document.querySelectorAll('.ghost').forEach(g=>g.addEventListener('click',()=>{
 }));
 document.querySelectorAll('.ghost').forEach(g=>g.addEventListener('animationend',e=>{if(e.animationName==='wig')g.classList.remove('wiggle')}));
 
-const BASE=location.origin+location.pathname;
-const ALPHA='23456789abcdefghijkmnpqrstuvwxyz';
-function h32(x){x=Math.imul((x>>>0)^0x5bd1e995,0x27d4eb2d);x^=x>>>15;x=Math.imul(x,0x85ebca6b);x^=x>>>13;x=Math.imul(x,0xc2b2ae35);x^=x>>>16;return x>>>0}
-function strSeed(str){let a=0x811c9dc5;for(const ch of str){a^=ch.codePointAt(0);a=Math.imul(a,0x01000193)}return h32(a)}
-function prng(seed){let t=seed>>>0;return()=>{t=(t+0x6D2B79F5)>>>0;let r=Math.imul(t^(t>>>15),1|t);r=(r+Math.imul(r^(r>>>7),61|r))^r;return((r^(r>>>14))>>>0)/4294967296}}
-
-function makeToken(giver,target){
-  const salt=crypto.getRandomValues(new Uint32Array(1))[0]&0xFFFFF;
-  const payload=(giver<<4)|target;
-  const px=(payload^(h32(salt)&0xFF))&0xFF;
-  const check=h32(salt^(payload<<20)^0xA5A5)&0xFFF;
-  let v=salt*1048576+((px<<12)|check), out='';
-  for(let i=0;i<8;i++){out=ALPHA[v%32]+out;v=Math.floor(v/32)}
-  return 'm'+out;
-}
-function readToken(tok){
-  tok=(tok||'').trim().replace(/^.*#/,'').toLowerCase();
-  if(!/^m[23456789abcdefghijkmnpqrstuvwxyz]{8}$/.test(tok)) return null;
-  let v=0;for(const c of tok.slice(1)) v=v*32+ALPHA.indexOf(c);
-  const low=v%1048576, salt=Math.floor(v/1048576);
-  const px=low>>>12, check=low&0xFFF;
-  const payload=(px^(h32(salt)&0xFF))&0xFF;
-  if((h32(salt^(payload<<20)^0xA5A5)&0xFFF)!==check) return null;
-  const giver=payload>>4, target=payload&15;
-  if(giver>=N||target>=N||giver===target) return null;
-  return {giver,target,tok};
-}
-
-let current=null;
-function showState(){
-  const hash=location.hash.slice(1);
-  $('m-admin').hidden=(hash!=='shuffle');
-  let t=readToken(hash);
-  if(!t){const saved=store.get('gj26-token');if(saved) t=readToken(saved)}
-  current=t;
-  $('m-wait').hidden=!!t; $('m-ready').hidden=!t; $('m-show').hidden=true;
-  if(t){$('m-hello').textContent=NAMES[t.giver]+', 마니또 확인할 준비 됐어?'}
-  if(hash==='shuffle'||readToken(hash)){
-    requestAnimationFrame(()=>document.getElementById('manito').scrollIntoView({block:'start'}));
-  }
-}
-$('m-key-go').addEventListener('click',()=>{
-  const t=readToken($('m-key').value);
-  const msg=$('m-key-msg');
-  if(!t){msg.className='msg bad';msg.textContent='열쇠가 맞지 않아. 받은 링크 끝부분을 그대로 다시 넣어줘.';return}
-  msg.textContent='';store.set('gj26-token',t.tok);showState();
-});
-$('m-open').addEventListener('click',()=>{
-  if(!current) return;
-  store.set('gj26-token',current.tok);
-  $('r-who').textContent=NAMES[current.target];
-  $('m-ready').hidden=true;$('m-show').hidden=false;
-  const c=$('r-card');c.classList.remove('pop');void c.offsetWidth;c.classList.add('pop');
-});
-$('m-hide').addEventListener('click',()=>{$('r-who').textContent='';$('m-show').hidden=true;$('m-ready').hidden=false});
-
-$('a-go').addEventListener('click',()=>{
-  const seed=$('a-seed').value.trim(), msg=$('a-msg');
-  if(!seed){msg.className='msg bad';msg.textContent='아무 숫자나 하나 입력해줘.';return}
-  const rand=prng(strSeed('gj26:'+seed));
-  const order=[...Array(N).keys()];
-  for(let i=N-1;i>0;i--){const r=Math.floor(rand()*(i+1));[order[i],order[r]]=[order[r],order[i]]}
-  const target=new Array(N);
-  for(let k=0;k<N;k++) target[order[k]]=order[(k+1)%N];
-  const list=$('a-list');list.innerHTML='';
-  NAMES.forEach((name,i)=>{
-    const link=BASE+'#'+makeToken(i,target[i]);
-    const text=name+', 긍정의밤 마니또 확인 링크야. 너만 열어봐!\n'+link;
-    const li=document.createElement('li');
-    const sp=document.createElement('span');sp.textContent=name;
-    const bt=document.createElement('button');bt.className='btn ghost';bt.textContent='메시지 복사';
-    bt.addEventListener('click',async()=>{
-      let ok=false;
-      try{await navigator.clipboard.writeText(text);ok=true}catch(e){
-        const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();
-        try{ok=document.execCommand('copy')}catch(e2){}ta.remove();
-      }
-      bt.textContent=ok?'복사됨 ✓':'복사 실패';
-      if(ok) sp.className='done';
-    });
-    li.append(sp,bt);list.appendChild(li);
-  });
-  msg.className='msg ok';msg.textContent='매칭 완료. 각자에게 1:1 카톡으로 메시지를 보내줘.';
-});
-
-window.addEventListener('hashchange',showState);
-showState();
 
 })();
 </script>
+<script src="config.js"></script>
 <script>
 (function(){
 const NAMES=['구세라','권경지','권순록','김강일','류원선','박재훈','서정윤','유세종','이대호','이수한','천수진'];
+const N=NAMES.length;
+const API=/^https:\/\/script\.google\.com\//.test((window.GJ_API||'').trim())?window.GJ_API.trim():'';
 const $=id=>document.getElementById(id);
-const DEFAULT={tasks:[{id:'staff',title:'운영진',people:[]}]};
-let state=JSON.parse(JSON.stringify(DEFAULT));
-let canEdit=false, dirty=false, selected=null, armed=null;
-
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const C=window.crypto&&crypto.subtle;
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
-function clean(s){
-  if(!s||!Array.isArray(s.tasks)) return null;
-  return {tasks:s.tasks.filter(t=>t&&typeof t.title==='string').map(t=>({id:String(t.id||('t'+Math.random().toString(36).slice(2,8))),title:t.title.slice(0,40),people:(Array.isArray(t.people)?t.people:[]).filter(i=>Number.isInteger(i)&&i>=0&&i<NAMES.length)}))};
+
+/* ---------- server ---------- */
+async function api(params,post){
+  if(!API){const e=new Error('noapi');e.code='noapi';throw e}
+  let r;
+  if(post) r=await fetch(API,{method:'POST',body:JSON.stringify(params)});
+  else r=await fetch(API+'?'+new URLSearchParams(params).toString());
+  const j=await r.json();
+  if(!j.ok){const e=new Error(j.err);e.code=j.err;e.data=j;throw e}
+  return j;
 }
 
-function render(){
-  $('pool-wrap').hidden=!canEdit;$('addtask').hidden=!canEdit;
-  $('todo-lede').textContent=canEdit?'운영진 편집 모드. 다 넣었으면 아래에서 board.json을 받아 GitHub에 올려줘.':'누가 뭘 맡았는지 한눈에. 운영진이 이름을 넣어둘게.';
+let S={board:{tasks:[{id:'staff',title:'운영진',people:[]}]},registered:[],started:false};
+let loaded=false;
+
+/* ---------- board ---------- */
+let selected=null, armed=null, pending=0, queue=Promise.resolve();
+function setSync(t,cls){const s=$('sync');s.textContent=t;s.className='sync'+(cls?' '+cls:'')}
+
+function renderBoard(){
+  const live=!!API&&loaded;
+  $('pool-wrap').hidden=!live;$('addtask').hidden=!live;
   const pool=$('pool');pool.innerHTML='';
   NAMES.forEach((n,i)=>{const b=el('button','pchip'+(selected===i?' sel':''),n);b.type='button';b.dataset.i=i;pool.appendChild(b)});
-  $('pool-help').textContent=selected===null?'이름을 할 일 카드로 끌어다 놓거나, 이름을 누른 다음 카드를 눌러줘. 한 사람이 여러 일을 맡아도 돼.':NAMES[selected]+' 선택됨. 넣을 카드를 눌러줘.';
+  $('pool-help').textContent=selected===null?'내 이름을 할 일 카드로 끌어다 놓거나, 이름을 누른 다음 카드를 눌러줘. 자동으로 저장돼.':NAMES[selected]+' 선택됨. 넣을 카드를 눌러줘.';
   const board=$('board');board.innerHTML='';
-  state.tasks.forEach(t=>{
-    const card=el('div','sticker task'+(t.id==='staff'?' staff':'')+(selected!==null&&canEdit?' target':''));card.dataset.id=t.id;
+  S.board.tasks.forEach(t=>{
+    const card=el('div','sticker task'+(t.id==='staff'?' staff':'')+(selected!==null&&live?' target':''));card.dataset.id=t.id;
     const head=el('div','task-head');
     head.append(el('h3',null,t.title),el('span','cnt',t.people.length+'명'));
-    if(canEdit&&t.id!=='staff'){const d=el('button','tdel'+(armed===t.id?' arm':''),armed===t.id?'정말 삭제?':'삭제');d.type='button';d.dataset.del=t.id;head.appendChild(d)}
+    if(live&&t.id!=='staff'){const d=el('button','tdel'+(armed===t.id?' arm':''),armed===t.id?'정말 삭제?':'삭제');d.type='button';d.dataset.del=t.id;head.appendChild(d)}
     const ul=el('ul','people');
-    if(!t.people.length) ul.appendChild(el('li','empty',canEdit?'이름을 여기로':'아직 비어 있어'));
-    t.people.forEach(i=>{const li=el('li',canEdit?'':'only',NAMES[i]);if(canEdit){const x=el('button',null,'×');x.type='button';x.dataset.rm=t.id+':'+i;x.setAttribute('aria-label',NAMES[i]+' 빼기');li.appendChild(x)}ul.appendChild(li)});
+    if(!t.people.length) ul.appendChild(el('li','empty',live?'이름을 여기로':'아직 비어 있어'));
+    t.people.forEach(i=>{const li=el('li',live?'':'only',NAMES[i]);if(live){const x=el('button',null,'×');x.type='button';x.dataset.rm=t.id+':'+i;x.setAttribute('aria-label',NAMES[i]+' 빼기');li.appendChild(x)}ul.appendChild(li)});
     card.append(head,ul);board.appendChild(card);
   });
-  $('savebar').hidden=!(canEdit&&dirty);
 }
-function changed(){dirty=true;$('save-msg').textContent='바뀐 내용이 있어';render()}
-function addPerson(tid,i){const t=state.tasks.find(t=>t.id===tid);if(!t||t.people.includes(i))return;t.people.push(i);changed()}
-
+function applyLocal(op){
+  const b=S.board, t=op.tid?b.tasks.find(x=>x.id===op.tid):null;
+  if(op.type==='add'&&t&&!t.people.includes(op.i)) t.people.push(op.i);
+  else if(op.type==='remove'&&t) t.people=t.people.filter(p=>p!==op.i);
+  else if(op.type==='addTask') b.tasks.push({id:op.id,title:op.title,people:[]});
+  else if(op.type==='delTask') b.tasks=b.tasks.filter(x=>x.id!==op.tid);
+}
+function send(op){
+  applyLocal(op);renderBoard();
+  pending++;setSync('저장 중…');
+  queue=queue.then(async()=>{
+    try{const j=await api({a:'board',op},true);pending--;if(!pending){S.board=j.board;S.registered=j.registered;S.started=j.started;renderAll();setSync('저장됨 ✓','ok')}}
+    catch(e){pending--;setSync('저장하지 못했어. 새로고침 후 다시 해줘','bad');refresh()}
+  });
+}
 $('board').addEventListener('click',e=>{
-  if(!canEdit) return;
+  if(!API||!loaded) return;
   const rm=e.target.closest('[data-rm]');
-  if(rm){const[tid,i]=rm.dataset.rm.split(':');const t=state.tasks.find(t=>t.id===tid);t.people=t.people.filter(p=>p!==+i);changed();return}
+  if(rm){const[tid,i]=rm.dataset.rm.split(':');send({type:'remove',tid,i:+i});return}
   const del=e.target.closest('[data-del]');
   if(del){const id=del.dataset.del;
-    if(armed===id){state.tasks=state.tasks.filter(t=>t.id!==id);armed=null;changed()}
-    else{armed=id;render();setTimeout(()=>{if(armed===id){armed=null;render()}},3000)}
+    if(armed===id){armed=null;send({type:'delTask',tid:id})}
+    else{armed=id;renderBoard();setTimeout(()=>{if(armed===id){armed=null;renderBoard()}},3000)}
     return}
   const card=e.target.closest('.task');
-  if(card&&selected!==null){addPerson(card.dataset.id,selected);selected=null;render()}
+  if(card&&selected!==null){const i=selected;selected=null;send({type:'add',tid:card.dataset.id,i})}
 });
-
 let drag=null;
 $('pool').addEventListener('pointerdown',e=>{
-  const c=e.target.closest('.pchip');if(!c||!canEdit)return;
+  const c=e.target.closest('.pchip');if(!c)return;
   drag={i:+c.dataset.i,x:e.clientX,y:e.clientY,on:false,fl:null,over:null};
 });
 function taskAt(x,y){const t=document.elementFromPoint(x,y);return t?t.closest('.task'):null}
@@ -521,48 +467,144 @@ function endDrag(e,cancel){
   if(!drag)return;const d=drag;drag=null;
   if(d.fl)d.fl.remove();if(d.over)d.over.classList.remove('over');
   if(cancel)return;
-  if(d.on){const t=taskAt(e.clientX,e.clientY);if(t){addPerson(t.dataset.id,d.i);selected=null;render()}}
-  else{selected=(selected===d.i?null:d.i);render()}
+  if(d.on){const t=taskAt(e.clientX,e.clientY);if(t){selected=null;send({type:'add',tid:t.dataset.id,i:d.i})}}
+  else{selected=(selected===d.i?null:d.i);renderBoard()}
 }
 document.addEventListener('pointerup',e=>endDrag(e,false));
 document.addEventListener('pointercancel',e=>endDrag(e,true));
-
 function addTask(){
-  const v=$('t-new').value.trim();if(!v)return;
-  state.tasks.push({id:'t'+Date.now().toString(36)+Math.floor(Math.random()*1e4),title:v,people:[]});
-  $('t-new').value='';changed();
+  const v=$('t-new').value.trim();if(!v||!API||!loaded)return;
+  $('t-new').value='';
+  send({type:'addTask',id:'t'+Date.now().toString(36)+Math.floor(Math.random()*1e4),title:v.slice(0,40)});
 }
 $('t-add').addEventListener('click',addTask);
 $('t-new').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();addTask()}});
 
-/* export */
-const json=()=>JSON.stringify(state,null,2)+'\n';
-$('dl-btn').addEventListener('click',()=>{
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([json()],{type:'application/json'}));
-  a.download='board.json';document.body.appendChild(a);a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
-  $('save-msg').textContent='받은 파일을 GitHub에 올리면 반영돼';
-});
-$('copy-btn').addEventListener('click',async()=>{
-  let ok=false;
-  try{await navigator.clipboard.writeText(json());ok=true}catch(e){
-    const ta=document.createElement('textarea');ta.value=json();document.body.appendChild(ta);ta.select();
-    try{ok=document.execCommand('copy')}catch(e2){}ta.remove();
-  }
-  $('save-msg').textContent=ok?'복사됨. GitHub의 board.json에 붙여넣어줘':'복사하지 못했어. 파일 받기를 써줘';
-});
-window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+/* ---------- manito crypto ---------- */
+const b64={enc(u8){let s='';u8=new Uint8Array(u8);for(let i=0;i<u8.length;i++)s+=String.fromCharCode(u8[i]);return btoa(s)},dec(s){const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}};
+const hex=u8=>[...new Uint8Array(u8)].map(x=>x.toString(16).padStart(2,'0')).join('');
+const rnd=n=>crypto.getRandomValues(new Uint8Array(n));
+const EC={name:'ECDH',namedCurve:'P-256'};
+async function pinKeys(pin,salt){
+  const base=await C.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveBits']);
+  const bits=new Uint8Array(await C.deriveBits({name:'PBKDF2',salt,iterations:300000,hash:'SHA-256'},base,512));
+  const aes=await C.importKey('raw',bits.slice(0,32),'AES-GCM',false,['encrypt','decrypt']);
+  const ver=hex(await C.digest('SHA-256',bits.slice(32)));
+  return {aes,ver};
+}
 
-function applyHash(){canEdit=(location.hash==='#admin');selected=null;render();
-  if(canEdit) requestAnimationFrame(()=>$('todo').scrollIntoView({block:'start'}));}
-window.addEventListener('hashchange',applyHash);
+/* ---------- manito UI ---------- */
+const sel=$('mn-name');
+sel.innerHTML='<option value="">이름 선택</option>'+NAMES.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
+const savedName=store.get('gj26-name');if(savedName!==null)sel.value=savedName;
+$('ad-who').innerHTML=NAMES.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
 
-fetch('board.json?v='+Date.now(),{cache:'no-store'})
-  .then(r=>r.ok?r.json():null)
-  .then(d=>{const c=clean(d);if(c&&!dirty){state=c;render()}})
-  .catch(()=>{});
-applyHash();
+function msg(id,t,cls){const m=$(id);m.textContent=t||'';m.className='msg'+(cls?' '+cls:'')}
+function renderManito(){
+  const reg=new Set(S.registered);
+  $('mn-chips').innerHTML=NAMES.map((n,i)=>`<li class="${reg.has(i)?'got':''}">${reg.has(i)?'✓ ':''}${n}</li>`).join('');
+  $('mn-progress').textContent=!loaded?'불러오는 중…':S.started?'매칭 완료! 이름과 비밀번호로 내 마니또를 확인해봐.':`${reg.size}/${N}명 등록${reg.size===N?'. 운영진이 매칭을 시작하면 확인할 수 있어.':''}`;
+  const v=sel.value, isReg=v!==''&&reg.has(+v);
+  $('mn-pw2-wrap').hidden=isReg||v==='';
+  $('mn-go').textContent=v===''?'이름을 골라줘':isReg?(S.started?'내 마니또 확인하기':'등록 확인하기'):'등록하기';
+  $('mn-go').disabled=v===''||!loaded;
+  $('mn-pwlabel').textContent=isReg?'비밀번호':'비밀번호 정하기 (4자리 이상, 잊으면 운영진이 초기화해야 해)';
+  $('ad-start').textContent=S.started?'다시 섞기':'매칭 시작';
+  $('ad-start').disabled=!(reg.size===N);
+}
+sel.addEventListener('change',()=>{msg('mn-msg','');$('m-show').hidden=true;renderManito()});
+
+$('mn-go').addEventListener('click',async()=>{
+  const v=sel.value;if(v==='')return;
+  const i=+v, pw=$('mn-pw').value, isReg=S.registered.includes(i);
+  if(!C){msg('mn-msg','이 브라우저에서는 안 돼. 크롬이나 사파리로 열어줘.','bad');return}
+  if(pw.length<4){msg('mn-msg','비밀번호는 4자리 이상이야.','bad');return}
+  $('mn-go').disabled=true;
+  try{
+    if(!isReg){
+      if(pw!==$('mn-pw2').value){msg('mn-msg','두 비밀번호가 달라. 다시 입력해줘.','bad');return}
+      msg('mn-msg','등록하는 중…');
+      const kp=await C.generateKey(EC,true,['deriveKey']);
+      const pub=await C.exportKey('raw',kp.publicKey), priv=await C.exportKey('pkcs8',kp.privateKey);
+      const salt=rnd(16), iv=rnd(12);
+      const {aes,ver}=await pinKeys(pw,salt);
+      const enc=await C.encrypt({name:'AES-GCM',iv,additionalData:new Uint8Array([i])},aes,priv);
+      const j=await api({a:'register',i,pub:b64.enc(pub),salt:b64.enc(salt),iv:b64.enc(iv),enc:b64.enc(enc),ver},true);
+      S.registered=j.registered;S.started=j.started;store.set('gj26-name',v);
+      $('mn-pw').value='';$('mn-pw2').value='';
+      msg('mn-msg',NAMES[i]+' 등록 완료! 비밀번호 꼭 기억해둬.','ok');renderManito();
+    }else{
+      msg('mn-msg','확인하는 중…');
+      const s=await api({a:'salt',i});
+      const {aes,ver}=await pinKeys(pw,b64.dec(s.salt));
+      const r=await api({a:'mine',i,v:ver});
+      store.set('gj26-name',v);$('mn-pw').value='';
+      if(!r.started){msg('mn-msg','등록은 잘 돼 있어. 아직 매칭 전이니까 조금만 기다려줘.','ok');return}
+      const priv=await C.decrypt({name:'AES-GCM',iv:b64.dec(r.iv),additionalData:new Uint8Array([i])},aes,b64.dec(r.enc));
+      const pk=await C.importKey('pkcs8',priv,EC,false,['deriveKey']);
+      const ep=await C.importKey('raw',b64.dec(r.eph),EC,false,[]);
+      const k=await C.deriveKey({name:'ECDH',public:ep},pk,{name:'AES-GCM',length:256},false,['decrypt']);
+      const t=new Uint8Array(await C.decrypt({name:'AES-GCM',iv:b64.dec(r.iv2),additionalData:new Uint8Array([i])},k,b64.dec(r.ct)))[0];
+      msg('mn-msg','');
+      $('r-who').textContent=NAMES[t];$('m-show').hidden=false;
+      const c=$('r-card');c.classList.remove('pop');void c.offsetWidth;c.classList.add('pop');
+    }
+  }catch(e){
+    const c=e.code;
+    const M={taken:'이미 등록된 이름이야. 본인인데 비밀번호가 기억 안 나면 운영진에게 초기화를 부탁해.',badpin:'비밀번호가 맞지 않아.'+(e.data&&e.data.left!=null?` (남은 시도 ${e.data.left}번)`:''),locked:'비밀번호를 너무 많이 틀렸어. 운영진에게 초기화를 부탁해.',notreg:'아직 등록되지 않은 이름이야.',noapi:'아직 서버가 연결되지 않았어.'};
+    msg('mn-msg',M[c]||'문제가 생겼어. 잠시 후 다시 해줘.','bad');
+    refresh();
+  }finally{$('mn-go').disabled=false;renderManito()}
+});
+$('m-hide').addEventListener('click',()=>{$('m-show').hidden=true;$('r-who').textContent=''});
+
+/* ---------- admin (#admin) ---------- */
+let startArmed=false;
+$('ad-start').addEventListener('click',async()=>{
+  const pw=$('ad-pw').value;if(!pw){msg('ad-msg','운영진 비밀번호를 입력해줘.','bad');return}
+  if(S.started&&!startArmed){startArmed=true;$('ad-start').textContent='정말 다시 섞을까?';setTimeout(()=>{startArmed=false;renderManito()},4000);return}
+  startArmed=false;$('ad-start').disabled=true;msg('ad-msg','섞는 중…');
+  try{
+    const {pubs}=await api({a:'pubs',pw},true);
+    const order=[...Array(N).keys()];
+    for(let i=N-1;i>0;i--){const r=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[order[i],order[r]]=[order[r],order[i]]}
+    let target=new Array(N);for(let k=0;k<N;k++)target[order[k]]=order[(k+1)%N];
+    const eph=await C.generateKey(EC,true,['deriveKey']);
+    const items=[];
+    for(let i=0;i<N;i++){
+      const rp=await C.importKey('raw',b64.dec(pubs[i]),EC,false,[]);
+      const k=await C.deriveKey({name:'ECDH',public:rp},eph.privateKey,{name:'AES-GCM',length:256},false,['encrypt']);
+      const iv2=rnd(12);
+      const ct=await C.encrypt({name:'AES-GCM',iv:iv2,additionalData:new Uint8Array([i])},k,new Uint8Array([target[i]]));
+      items.push({i,iv2:b64.enc(iv2),ct:b64.enc(ct)});
+    }
+    target=null;order.length=0;
+    const j=await api({a:'start',pw,eph:b64.enc(await C.exportKey('raw',eph.publicKey)),items},true);
+    S.registered=j.registered;S.started=j.started;
+    msg('ad-msg','매칭 완료! 결과는 아무 데도 표시되지 않아. 단톡방에 확인하라고 알려줘.','ok');
+  }catch(e){msg('ad-msg',e.code==='badpw'?'운영진 비밀번호가 틀렸어.':e.code==='not_all'?'아직 11명이 다 등록하지 않았어.':'문제가 생겼어. 잠시 후 다시 해줘.','bad')}
+  finally{renderManito()}
+});
+$('ad-reset').addEventListener('click',async()=>{
+  const pw=$('ad-pw').value;if(!pw){msg('ad-msg','운영진 비밀번호를 입력해줘.','bad');return}
+  const i=+$('ad-who').value;
+  try{const j=await api({a:'reset',pw,i},true);S.registered=j.registered;S.started=j.started;msg('ad-msg',NAMES[i]+' 초기화 완료. 다시 등록하면 매칭도 다시 시작해줘.','ok')}
+  catch(e){msg('ad-msg',e.code==='badpw'?'운영진 비밀번호가 틀렸어.':'문제가 생겼어. 잠시 후 다시 해줘.','bad')}
+  renderManito();
+});
+function applyHash(){$('m-admin').hidden=location.hash!=='#admin';if(location.hash==='#admin')requestAnimationFrame(()=>$('manito').scrollIntoView({block:'start'}))}
+window.addEventListener('hashchange',applyHash);applyHash();
+
+/* ---------- load & poll ---------- */
+function renderAll(){renderBoard();renderManito()}
+async function refresh(){
+  if(!API){renderAll();$('nosrv').hidden=false;return}
+  try{const j=await api({a:'state'});if(!pending&&!drag){S=j;loaded=true;renderAll()}}
+  catch(e){if(!loaded)setSync('서버에 연결하지 못했어. 잠시 후 새로고침해줘','bad')}
+}
+renderAll();refresh();
+setInterval(()=>{if(document.visibilityState==='visible')refresh()},20000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
 })();
 </script>
 </body>
