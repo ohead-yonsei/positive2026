@@ -244,6 +244,7 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
 #g-again{margin-top:14px}
 
 </style>
+<link rel="stylesheet" href="raffle.css?v=20261023-1">
 </head>
 <body>
 
@@ -382,6 +383,36 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
       <p class="note">초기화하면 그 사람은 다시 등록해야 하고, 매칭도 처음부터 다시 시작해야 해.</p>
     </div>
   </section>
+  <section id="raffle">
+    <div class="sh"><h2>유령의 선물</h2><span class="tag">Boo! Roulette</span></div>
+    <p class="lede">유령을 놀래킬수록 행운이 쌓여. 선물의 주인은 31일에!</p>
+    <div class="sticker raffle-card">
+      <h3>100번마다 추첨권 한 장 👻</h3>
+      <p class="raffle-rules">1인 최대 5장 · 기프티콘은 딱 한 명에게!<br>10월 30일 밤 11시 59분 59초까지 응모하고<br>31일에 응모권 비율대로 룰렛 추첨해. (한국시간)</p>
+      <p id="rf-clock" class="raffle-clock"></p>
+      <div class="raffle-meter"><div><strong id="rf-count">0번</strong><span>이 브라우저에서 놀래킨 횟수</span></div><div><strong id="rf-tickets">0 / 5장</strong><span>서버에 저장된 내 응모권</span></div></div>
+      <label for="rf-name">응모할 내 이름</label>
+      <select id="rf-name"></select>
+      <button class="btn" id="rf-enroll" disabled>100번부터 응모 가능</button>
+      <button class="btn" id="rf-sync" hidden>내 응모권 저장 확인</button>
+      <p id="rf-status" class="raffle-status" role="status">추첨 이벤트를 불러오는 중…</p>
+      <button class="btn ghosty" id="rf-retry">현황 새로고침</button>
+      <p class="note">기존에 누른 횟수도 첫 응모에 포함돼.<br>응모한 폰·브라우저를 계속 사용해줘. 당첨되면 여기서 선물을 열 수 있어.</p>
+      <div class="raffle-wheel"><canvas id="rf-wheel" width="600" height="600" role="img" aria-label="응모권 수에 비례한 룰렛. 아래에서 이름별 응모권과 확률을 확인할 수 있어."></canvas></div>
+      <p id="rf-total">참여 현황을 불러오는 중…</p>
+      <ul class="raffle-entries" id="rf-entries" aria-label="이름별 응모권과 당첨 확률"></ul>
+      <p id="rf-winner" role="status" hidden></p>
+      <button class="btn" id="rf-prize" hidden>🎁 내 선물 열기</button>
+      <div id="rf-admin" hidden>
+        <h3>운영진 · 선물 추첨</h3>
+        <p class="note">10월 31일 0시부터 한 번만 추첨할 수 있어. 당일 다 같이 모였을 때 눌러줘. 응모자가 없으면 추첨하지 않아.</p>
+        <label for="rf-admin-pw">운영진 비밀번호</label>
+        <input id="rf-admin-pw" type="password" autocomplete="off">
+        <button class="btn" id="rf-draw" disabled>룰렛 돌려 한 명 뽑기</button>
+        <p class="msg" id="rf-admin-msg" role="status"></p>
+      </div>
+    </div>
+  </section>
   <section id="soon">
     <div class="sh"><h2>커밍 순</h2><span class="tag">Coming soon</span></div>
     <p class="lede">이게 다가 아니야. 하나씩 열릴 예정.</p>
@@ -404,28 +435,17 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
 <div class="gmodal" id="gift-modal" hidden>
   <div class="sticker gbox" role="dialog" aria-modal="true" aria-labelledby="g-title">
     <button class="gclose" id="g-close" aria-label="닫기">×</button>
+    <h3 id="g-title">👻 100번 놀래킴 달성!</h3>
     <div id="g-ask">
-      <div class="gghost"><svg viewBox="0 0 100 124"><use href="#ghost"/></svg></div>
-      <h3 id="g-title">100번 놀래킴 달성!</h3>
-      <p>유령이 고마워서 선물을 숨겨놨대. 선물은 <b>처음 도착한 딱 한 명</b>만 받을 수 있어. 누가 받았는지 기록할게.</p>
-      <label for="g-name">내 이름</label>
-      <select id="g-name"></select>
-      <button class="btn" id="g-go">선물 열기</button>
-      <p class="msg" id="g-msg" aria-live="polite"></p>
+      <p>추첨권을 받을 준비가 됐어! 이름을 골라 응모하고,<br>10월 31일 룰렛을 기다려줘.</p>
+      <button class="btn" id="g-enter">내 추첨권 받으러 가기</button>
     </div>
     <div id="g-win" hidden>
-      <h3>🎉 선물 당첨!</h3>
-      <img id="g-img" alt="스타벅스 기프티콘">
-      <p class="note">지금 캡처해서 저장해둬! 이 폰에서는 맨 아래 ‘내 선물 다시 보기’로 다시 열 수 있어.</p>
-    </div>
-    <div id="g-lose" hidden>
-      <div class="gghost"><svg viewBox="0 0 100 124"><use href="#ghost"/></svg></div>
-      <h3>앗, 한발 늦었어 👻</h3>
-      <p id="g-lose-t"></p>
+      <img id="g-img" alt="당첨자 전용 기프티콘">
+      <p class="note">지금 캡처해서 보관해줘! 응모한 이 브라우저에서 ‘내 선물 다시 보기’로 다시 열 수 있어.</p>
     </div>
   </div>
 </div>
-
 
 <script>
 (function(){
@@ -444,10 +464,11 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 
 /* Boo! ghosts */
 const BOOS=['Boo!','Boo! 놀랐지?','긍정 Boo!','Boo~ 떡볶이 뭐 가져와?','Boo! 입구에서 단체티 받아!','Boo! 마니또 확인했어?','Booooo!'];
-let booN=+(store.get('gj26-boo')||0)||0;
+let booN=Math.min(1000000,Math.max(0,Math.floor(Number(store.get('gj26-boo'))||0)));
 document.querySelectorAll('.ghost').forEach(g=>g.addEventListener('click',()=>{
   const b=$(g.dataset.bubble);
-  b.textContent=BOOS[booN%BOOS.length];booN++;
+  booN=Math.min(1000000,Math.max(booN,Math.floor(Number(store.get('gj26-boo'))||0))+1);
+  b.textContent=BOOS[(booN-1)%BOOS.length];
   b.hidden=false;b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');
   g.classList.remove('wiggle');void g.offsetWidth;g.classList.add('wiggle');
   clearTimeout(b._t);b._t=setTimeout(()=>{b.hidden=true},1800);
@@ -566,69 +587,6 @@ function addTask(){
 }
 $('t-add').addEventListener('click',addTask);
 $('t-new').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();addTask()}});
-
-/* ---------- Boo 100번 선물 ---------- */
-let gift={claimed:false,by:null}, giftLoaded=false, toastT=null;
-function booLines(n){
-  if(store.get('gj26-gift-token')) return [`유령을 ${n}번 놀래켰어 👻`,'선물은 네가 받았어 🎉'];
-  if(gift.claimed) return [`유령을 ${n}번 놀래켰어 👻`, gift.by!=null?`선물은 이미 ${NAMES[gift.by]}에게 갔어`:'선물은 이미 주인을 찾았어'];
-  if(n>=100) return [`유령을 ${n}번 놀래켰어 👻`,'특별한 게 나타났어!'];
-  return [`유령을 ${n}번 놀래켰어 👻`,'100번 놀래키면 특별한 게 있을걸?'];
-}
-function renderBooFoot(n){
-  n=n==null?(+(store.get('gj26-boo')||0)||0):n;
-  const [a,b]=booLines(n);
-  $('boocount').textContent=n>0?a+' · '+b:'';
-  $('g-again').hidden=!store.get('gj26-gift-token');
-}
-function toast(n){
-  const [a,b]=booLines(n), t=$('bootoast');
-  t.textContent='';t.append(a);const sm=document.createElement('small');sm.textContent=b;t.appendChild(sm);
-  t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},1800);
-}
-async function loadGift(){
-  if(!API)return;
-  try{const j=await api({a:'gift',op:'status'});gift={claimed:!!j.claimed,by:j.by};giftLoaded=true;renderBooFoot()}catch(e){}
-}
-function showGiftPane(p){['g-ask','g-win','g-lose'].forEach(id=>$(id).hidden=(id!==p));$('gift-modal').hidden=false}
-function openGiftAsk(){
-  const gs=$('g-name');
-  gs.innerHTML='<option value="">이름 선택</option>'+NAMES.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
-  const sv=store.get('gj26-name');if(sv!==null)gs.value=sv;
-  msg('g-msg','');showGiftPane('g-ask');
-}
-function showLose(by){
-  gift={claimed:true,by};
-  $('g-lose-t').textContent=(by!=null?`${NAMES[by]}이(가) 먼저 100번을 채워서 선물을 가져갔어.`:'누군가 먼저 선물을 가져갔어.')+' 그래도 놀래켜줘서 고마워!';
-  showGiftPane('g-lose');renderBooFoot();
-}
-document.addEventListener('gj-boo',e=>{
-  const n=e.detail;toast(n);renderBooFoot(n);
-  if(n>=100&&!store.get('gj26-gift-seen')){
-    store.set('gj26-gift-seen','1');
-    if(!API){return}
-    if(gift.claimed) showLose(gift.by); else openGiftAsk();
-  }
-});
-$('g-go').addEventListener('click',async()=>{
-  const v=$('g-name').value;if(v===''){msg('g-msg','이름을 골라줘.','bad');return}
-  $('g-go').disabled=true;msg('g-msg','선물 상자 여는 중…');
-  try{
-    const j=await api({a:'gift',op:'claim',i:+v},true);
-    store.set('gj26-name',v);
-    if(j.won){store.set('gj26-gift-token',j.token);gift={claimed:true,by:j.by};$('g-img').src=j.img;showGiftPane('g-win');renderBooFoot()}
-    else showLose(j.by);
-  }catch(e){msg('g-msg','문제가 생겼어. 잠시 후 다시 눌러줘.','bad')}
-  finally{$('g-go').disabled=false}
-});
-$('g-again').addEventListener('click',async()=>{
-  const token=store.get('gj26-gift-token');if(!token)return;
-  try{const j=await api({a:'gift',op:'view',token},true);$('g-img').src=j.img;showGiftPane('g-win')}
-  catch(e){$('g-again').textContent='선물을 불러오지 못했어. 잠시 후 다시 눌러줘'}
-});
-$('g-close').addEventListener('click',()=>{$('gift-modal').hidden=true;$('g-img').removeAttribute('src')});
-$('gift-modal').addEventListener('click',e=>{if(e.target.id==='gift-modal'){$('gift-modal').hidden=true;$('g-img').removeAttribute('src')}});
-renderBooFoot();loadGift();
 
 /* ---------- 가져올 것 확인 ---------- */
 const ACKS=[['ack-ttk','떡볶이 확인'],['ack-daiso','다이소 확인']];
@@ -782,5 +740,6 @@ setInterval(()=>{if(document.visibilityState==='visible')refresh()},20000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
 })();
 </script>
+<script src="raffle.js?v=20261023-1"></script>
 </body>
 </html>

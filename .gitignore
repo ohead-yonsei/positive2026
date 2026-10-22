@@ -1,0 +1,5 @@
+# These production files contain the admin password or the actual gift image.
+/Code.gs
+/Gift.gs
+.clasp.json
+.clasprc.json
