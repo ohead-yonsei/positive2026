@@ -1,1 +1,1 @@
-window.GJ_API = "여기에_웹앱_URL_붙여넣기";
+window.GJ_API = "https://script.google.com/macros/s/AKfycbwcDsl7-QNlC6q7TxbtsBaEWenlGLZ4xBPp-UWdwlwljVfsJgO6nrwhXmJwt_4T-VkOBQ/exec";
