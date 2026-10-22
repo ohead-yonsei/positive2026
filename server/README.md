@@ -27,3 +27,20 @@ function giftAction(q) {
 
 `node --test tests/raffle*.test.cjs`로 가짜 저장소·시계·기프티콘을 사용해 검증한다.
 실서버에 응모·추첨 테스트 요청을 보내지 않는다.
+
+# 할 일 카드 색상
+
+카드는 `cream`(크림), `yellow`(노랑), `mint`(연두), `lavender`(라벤더) 중 하나를 `color`에 저장한다.
+색 정보가 없는 기존 카드는 운영진만 노랑, 나머지는 크림으로 표시한다.
+`Code.gs`의 `case 'board'`에서 `else return fail('bad_op');` 바로 앞에 아래 분기를 둔다.
+기존 `setJ('board', b)`와 ScriptLock을 통해 다른 카드 수정과 함께 저장한다.
+
+```js
+      else if (op.type === 'setColor') {
+        if (!t) return fail('not_found');
+        if (['cream', 'yellow', 'mint', 'lavender'].indexOf(op.color) < 0) return fail('bad_color');
+        t.color = op.color;
+      }
+```
+
+색 변경은 이름 추가/빼기나 카드 삭제와 독립적이다. 운영진 카드도 색을 바꿀 수 있고, 삭제 제한은 유지한다.

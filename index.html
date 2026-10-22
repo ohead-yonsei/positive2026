@@ -132,8 +132,16 @@ section{padding:50px 0 6px}
 .floater{position:fixed;z-index:50;pointer-events:none;font-family:var(--kr);font-size:17px;background:var(--candy);color:var(--paper-ink);
   border:2.5px solid var(--line);border-radius:999px;padding:4px 13px 2px;box-shadow:4px 5px 0 var(--line);transform:translate(-50%,-60%) rotate(-6deg)}
 .board{display:grid;gap:16px}
-.task{padding:14px 16px 16px;transition:transform .12s}
-.task.staff{background:var(--candy)}
+.task{padding:14px 16px 16px;transition:transform .12s;background:var(--task-color,var(--paper))}
+.task[data-color="cream"],.task-color[data-task-color="cream"]{--task-color:#FFF7EA}
+.task[data-color="yellow"],.task-color[data-task-color="yellow"]{--task-color:#FFD447}
+.task[data-color="mint"],.task-color[data-task-color="mint"]{--task-color:#D8EDB3}
+.task[data-color="lavender"],.task-color[data-task-color="lavender"]{--task-color:#DFD1F2}
+.task-colors{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:2px dashed #1A122626}
+.task-colors span{font-size:12px;color:var(--paper-soft);margin-right:auto}
+.task-color{flex:0 0 44px;width:44px;height:44px;border:2px solid var(--line);border-radius:50%;background:var(--task-color);color:var(--paper-ink);font:22px var(--kr);cursor:pointer;padding:0;touch-action:manipulation}
+.task-color[aria-pressed="true"]{box-shadow:inset 0 0 0 3px #fff}
+.task-color:focus-visible{outline-color:var(--line);border-radius:50%}
 .task.over,.task.target{transform:scale(1.02) rotate(-.6deg);outline:3px dashed var(--pumpkin);outline-offset:4px}
 .task-head{display:flex;align-items:center;gap:10px}
 .task-head h3{font-family:var(--kr);font-weight:400;font-size:22px;margin:0;flex:1;line-height:1.3}
@@ -300,7 +308,7 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
 
   <section id="todo">
     <div class="sh"><h2>할 일</h2><span class="tag">To-do</span></div>
-    <p class="lede" id="todo-lede">하고 싶은 일에 내 이름을 넣어줘. 넣는 순간 자동으로 저장되고, 할 일도 추가할 수 있어.</p>
+    <p class="lede" id="todo-lede">하고 싶은 일에 내 이름을 넣어줘. 할 일을 추가하거나 카드 색도 고를 수 있어. 바꾸면 자동으로 저장돼.</p>
 
     <div class="pool-wrap" id="pool-wrap" hidden>
       <p class="pool-help" id="pool-help">이름을 할 일 카드로 끌어다 놓거나, 이름을 누른 다음 카드를 눌러줘. 한 사람이 여러 일을 맡아도 돼.</p>
@@ -488,7 +496,7 @@ async function api(params,post){
   if(!API){const e=new Error('noapi');e.code='noapi';throw e}
   let r;
   if(post) r=await fetch(API,{method:'POST',body:JSON.stringify(params)});
-  else r=await fetch(API+'?'+new URLSearchParams(params).toString());
+  else r=await fetch(API+'?'+new URLSearchParams({...params,t:Date.now()}).toString(),{cache:'no-store'});
   const j=await r.json();
   if(!j.ok){const e=new Error(j.err);e.code=j.err;e.data=j;throw e}
   return j;
@@ -499,6 +507,8 @@ let loaded=false;
 
 /* ---------- board ---------- */
 let selected=null, armed=null, pending=0, queue=Promise.resolve();
+const TASK_COLORS=[['cream','크림'],['yellow','노랑'],['mint','연두'],['lavender','라벤더']];
+const taskColor=t=>TASK_COLORS.some(([key])=>key===t.color)?t.color:t.id==='staff'?'yellow':'cream';
 function setSync(t,cls){const s=$('sync');s.textContent=t;s.className='sync'+(cls?' '+cls:'')}
 
 function renderBoard(){
@@ -507,22 +517,38 @@ function renderBoard(){
   const pool=$('pool');pool.innerHTML='';
   NAMES.forEach((n,i)=>{const b=el('button','pchip'+(selected===i?' sel':''),n);b.type='button';b.dataset.i=i;pool.appendChild(b)});
   $('pool-help').textContent=selected===null?'내 이름을 할 일 카드로 끌어다 놓거나, 이름을 누른 다음 카드를 눌러줘. 자동으로 저장돼.':NAMES[selected]+' 선택됨. 넣을 카드를 눌러줘.';
-  const board=$('board');board.innerHTML='';
+  const board=$('board'), focused=document.activeElement?.closest('[data-task-color]');
+  const restore=focused?{tid:focused.closest('.task').dataset.id,color:focused.dataset.taskColor}:null;
+  board.innerHTML='';
   S.board.tasks.filter(t=>!String(t.id).startsWith('ack-')).forEach(t=>{
     const card=el('div','sticker task'+(t.id==='staff'?' staff':'')+(selected!==null&&live?' target':''));card.dataset.id=t.id;
+    card.dataset.color=taskColor(t);
     const head=el('div','task-head');
     head.append(el('h3',null,t.title),el('span','cnt',t.people.length+'명'));
     if(live&&t.id!=='staff'){const d=el('button','tdel'+(armed===t.id?' arm':''),armed===t.id?'정말 삭제?':'삭제');d.type='button';d.dataset.del=t.id;head.appendChild(d)}
     const ul=el('ul','people');
     if(!t.people.length) ul.appendChild(el('li','empty',live?'이름을 여기로':'아직 비어 있어'));
     t.people.forEach(i=>{const li=el('li',live?'':'only',NAMES[i]);if(live){const x=el('button',null,'×');x.type='button';x.dataset.rm=t.id+':'+i;x.setAttribute('aria-label',NAMES[i]+' 빼기');li.appendChild(x)}ul.appendChild(li)});
-    card.append(head,ul);board.appendChild(card);
+    card.append(head,ul);
+    if(live){
+      const colors=el('div','task-colors');colors.setAttribute('role','group');colors.setAttribute('aria-label',t.title+' 배경색');
+      colors.appendChild(el('span',null,'카드 색'));
+      TASK_COLORS.forEach(([key,label])=>{
+        const active=key===taskColor(t),button=el('button','task-color',active?'✓':'');
+        button.type='button';button.dataset.taskColor=key;button.title=label;
+        button.setAttribute('aria-label',t.title+': '+label+' 배경');button.setAttribute('aria-pressed',String(active));colors.appendChild(button);
+      });
+      card.appendChild(colors);
+    }
+    board.appendChild(card);
   });
+  if(restore)Array.from(board.querySelectorAll('[data-task-color]')).find(b=>b.dataset.taskColor===restore.color&&b.closest('.task').dataset.id===restore.tid)?.focus({preventScroll:true});
 }
 function applyLocal(op){
   const b=S.board, t=op.tid?b.tasks.find(x=>x.id===op.tid):null;
   if(op.type==='add'&&t&&!t.people.includes(op.i)) t.people.push(op.i);
   else if(op.type==='remove'&&t) t.people=t.people.filter(p=>p!==op.i);
+  else if(op.type==='setColor'&&t&&TASK_COLORS.some(([key])=>key===op.color)) t.color=op.color;
   else if(op.type==='addTask') b.tasks.push({id:op.id,title:op.title,people:[]});
   else if(op.type==='delTask') b.tasks=b.tasks.filter(x=>x.id!==op.tid);
 }
@@ -536,6 +562,12 @@ function send(op){
 }
 $('board').addEventListener('click',e=>{
   if(!API||!loaded) return;
+  const color=e.target.closest('[data-task-color]');
+  if(color){
+    const card=color.closest('.task');
+    if(card.dataset.color!==color.dataset.taskColor)send({type:'setColor',tid:card.dataset.id,color:color.dataset.taskColor});
+    return;
+  }
   const rm=e.target.closest('[data-rm]');
   if(rm){const[tid,i]=rm.dataset.rm.split(':');send({type:'remove',tid,i:+i});return}
   const del=e.target.closest('[data-del]');
