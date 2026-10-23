@@ -150,14 +150,17 @@ section{padding:50px 0 6px}
 .floater{position:fixed;z-index:50;pointer-events:none;font-family:var(--kr);font-size:17px;background:var(--candy);color:var(--paper-ink);
   border:2.5px solid var(--line);border-radius:999px;padding:4px 13px 2px;box-shadow:4px 5px 0 var(--line);transform:translate(-50%,-60%) rotate(-6deg)}
 .board{display:grid;gap:16px}
-.task{padding:14px 16px 16px;transition:transform .12s;background:var(--task-color,var(--paper))}
+.task{position:relative;padding:14px 16px 16px;transition:transform .12s;background:var(--task-color,var(--paper))}
 .task[data-color="cream"],.task-color[data-task-color="cream"]{--task-color:#FFF7EA}
 .task[data-color="yellow"],.task-color[data-task-color="yellow"]{--task-color:#FFD447}
 .task[data-color="mint"],.task-color[data-task-color="mint"]{--task-color:#D8EDB3}
 .task[data-color="lavender"],.task-color[data-task-color="lavender"]{--task-color:#DFD1F2}
-.task-colors{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:2px dashed #1A122626}
-.task-colors span{font-size:12px;color:var(--paper-soft);margin-right:auto}
-.task-color{flex:0 0 44px;width:44px;height:44px;border:2px solid var(--line);border-radius:50%;background:var(--task-color);color:var(--paper-ink);font:22px var(--kr);cursor:pointer;padding:0;touch-action:manipulation}
+.task-color-toggle{display:inline-flex;align-items:center;gap:4px;flex:none;min-height:28px;padding:2px 6px;border:1.5px solid var(--line);border-radius:8px;background:#ffffff80;color:var(--paper-ink);font:12px var(--body);cursor:pointer;touch-action:manipulation}
+.task-color-toggle::before{content:'';width:9px;height:9px;border:1px solid var(--line);border-radius:50%;background:var(--task-color)}
+.task-color-toggle[aria-expanded="true"]{background:#fff}
+.task-colors{position:absolute;right:12px;top:47px;z-index:6;display:flex;align-items:center;gap:7px;padding:8px;background:var(--paper);border:2px solid var(--line);border-radius:12px;box-shadow:3px 3px 0 var(--line)}
+.task-colors[hidden]{display:none}
+.task-color{flex:0 0 32px;width:32px;height:32px;border:2px solid var(--line);border-radius:50%;background:var(--task-color);color:var(--paper-ink);font:18px var(--kr);cursor:pointer;padding:0;touch-action:manipulation}
 .task-color[aria-pressed="true"]{box-shadow:inset 0 0 0 3px #fff}
 .task-color:focus-visible{outline-color:var(--line);border-radius:50%}
 .task.over,.task.target{transform:scale(1.02) rotate(-.6deg);outline:3px dashed var(--pumpkin);outline-offset:4px}
@@ -566,7 +569,7 @@ try{
 function cacheBoard(){store.set(BOARD_CACHE,JSON.stringify({api:API,at:Date.now(),board:S.board}));cachedBoard=true}
 
 /* ---------- board ---------- */
-let selected=null, arrivalSelected=null, armed=null, pending=0, queue=Promise.resolve();
+let selected=null, arrivalSelected=null, armed=null, colorOpen=null, pending=0, queue=Promise.resolve();
 const ARRIVAL_HOURS=[13,14,15,16,17,18,19];
 const arrivalLabel=hour=>hour===19?'19시 이후':hour+'시';
 const TASK_COLORS=[['cream','크림'],['yellow','노랑'],['mint','연두'],['lavender','라벤더']];
@@ -579,7 +582,7 @@ function renderBoard(){
   const pool=$('pool');pool.innerHTML='';
   NAMES.forEach((n,i)=>{const b=el('button','pchip'+(selected===i?' sel':''),n);b.type='button';b.dataset.i=i;pool.appendChild(b)});
   $('pool-help').textContent=selected===null?'내 이름을 할 일 카드로 끌어다 놓거나, 이름을 누른 다음 카드를 눌러줘. 자동으로 저장돼.':NAMES[selected]+' 선택됨. 넣을 카드를 눌러줘.';
-  const board=$('board'), focused=document.activeElement?.closest('[data-task-color]');
+  const board=$('board'), focused=document.activeElement?.closest('[data-task-color],[data-color-toggle]');
   const restore=focused?{tid:focused.closest('.task').dataset.id,color:focused.dataset.taskColor}:null;
   board.innerHTML='';
   S.board.tasks.filter(t=>!String(t.id).startsWith('ack-')).forEach(t=>{
@@ -587,6 +590,10 @@ function renderBoard(){
     card.dataset.color=taskColor(t);
     const head=el('div','task-head');
     head.append(el('h3',null,t.title),el('span','cnt',t.people.length+'명'));
+    if(live){
+      const toggle=el('button','task-color-toggle','색');toggle.type='button';toggle.dataset.colorToggle=t.id;
+      toggle.setAttribute('aria-label',t.title+' 카드 색 고르기');toggle.setAttribute('aria-expanded',String(colorOpen===t.id));toggle.setAttribute('aria-controls','task-colors-'+t.id);head.appendChild(toggle);
+    }
     if(live&&t.id!=='staff'){const d=el('button','tdel'+(armed===t.id?' arm':''),armed===t.id?'정말 삭제?':'삭제');d.type='button';d.dataset.del=t.id;head.appendChild(d)}
     const ul=el('ul','people');
     if(!t.people.length) ul.appendChild(el('li','empty',live?'이름을 여기로':'아직 비어 있어'));
@@ -594,7 +601,7 @@ function renderBoard(){
     card.append(head,ul);
     if(live){
       const colors=el('div','task-colors');colors.setAttribute('role','group');colors.setAttribute('aria-label',t.title+' 배경색');
-      colors.appendChild(el('span',null,'카드 색'));
+      colors.id='task-colors-'+t.id;colors.hidden=colorOpen!==t.id;
       TASK_COLORS.forEach(([key,label])=>{
         const active=key===taskColor(t),button=el('button','task-color',active?'✓':'');
         button.type='button';button.dataset.taskColor=key;button.title=label;
@@ -604,7 +611,11 @@ function renderBoard(){
     }
     board.appendChild(card);
   });
-  if(restore)Array.from(board.querySelectorAll('[data-task-color]')).find(b=>b.dataset.taskColor===restore.color&&b.closest('.task').dataset.id===restore.tid)?.focus({preventScroll:true});
+  if(restore){
+    const card=Array.from(board.children).find(c=>c.dataset.id===restore.tid);
+    const control=restore.color&&colorOpen===restore.tid?Array.from(card?.querySelectorAll('[data-task-color]')||[]).find(b=>b.dataset.taskColor===restore.color):card?.querySelector('[data-color-toggle]');
+    control?.focus({preventScroll:true});
+  }
 }
 function applyLocal(op){
   const b=S.board, t=op.tid?b.tasks.find(x=>x.id===op.tid):null;
@@ -629,12 +640,17 @@ function send(op){
 }
 $('board').addEventListener('click',e=>{
   if(!API||!loaded) return;
+  const toggle=e.target.closest('[data-color-toggle]');
+  if(toggle){colorOpen=colorOpen===toggle.dataset.colorToggle?null:toggle.dataset.colorToggle;renderBoard();return}
   const color=e.target.closest('[data-task-color]');
   if(color){
     const card=color.closest('.task');
+    colorOpen=null;
     if(card.dataset.color!==color.dataset.taskColor)send({type:'setColor',tid:card.dataset.id,color:color.dataset.taskColor});
+    else renderBoard();
     return;
   }
+  if(e.target.closest('.task-colors'))return;
   const rm=e.target.closest('[data-rm]');
   if(rm){const[tid,i]=rm.dataset.rm.split(':');send({type:'remove',tid,i:+i});return}
   const del=e.target.closest('[data-del]');
@@ -645,6 +661,7 @@ $('board').addEventListener('click',e=>{
   const card=e.target.closest('.task');
   if(card&&selected!==null){const i=selected;selected=null;send({type:'add',tid:card.dataset.id,i})}
 });
+$('board').addEventListener('keydown',e=>{if(e.key==='Escape'&&colorOpen!==null){e.preventDefault();colorOpen=null;renderBoard()}});
 let drag=null;
 function startDrag(e,scope){
   if(!API||!loaded)return;
