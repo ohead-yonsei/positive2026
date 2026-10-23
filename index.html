@@ -112,6 +112,9 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .trow dt{font-family:var(--marker);font-size:14px;color:var(--paper-soft);line-height:1.2}
 .trow dd{margin:0;font-family:var(--kr);font-size:20px;line-height:1.35}
 .trow dd small{display:block;font-family:var(--body);font-size:14px;color:var(--paper-soft)}
+.trow .venue-line{display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px}
+.venue-link{display:inline-flex;align-items:center;min-height:36px;padding:4px 8px;border:2px solid var(--line);border-radius:999px;background:#D8EDB3;color:var(--paper-ink);font:14px var(--kr);text-decoration:none;white-space:nowrap}
+.venue-link:focus-visible{outline:3px solid var(--pumpkin);outline-offset:3px}
 
 .guests{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:28px auto 0;padding:0;list-style:none;max-width:440px}
 .guests li{font-family:var(--kr);font-size:16px;background:var(--paper);color:var(--paper-ink);border:2.5px solid var(--line);border-radius:999px;padding:3px 13px 1px;box-shadow:2px 3px 0 var(--line)}
@@ -322,7 +325,7 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
       <div class="ticket-main">
         <dl style="margin:0">
           <div class="trow"><dt>When</dt><dd>10.31 토 – 11.1 일<small>1박 2일, 할로윈 당일 밤</small></dd></div>
-          <div class="trow"><dt>Where</dt><dd>돌기와토담집</dd></div>
+          <div class="trow"><dt>Where</dt><dd class="venue-line"><span>돌기와토담집</span><a class="venue-link" href="https://naver.me/xgNSc8Xl" target="_blank" rel="noopener noreferrer" aria-label="돌기와토담집 지도 보기 (새 창)">지도 보기 ↗</a></dd></div>
           <div class="trow"><dt>Menu</dt><dd>BBQ 파티 🔥<small>야식은 랜덤 떡볶이</small></dd></div>
           <div class="trow"><dt>Dress</dt><dd>올해 단체티<small>운영진이 준비해둘게. 입구에서 받아서 갈아입기</small></dd></div>
         </dl>
