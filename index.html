@@ -15,6 +15,21 @@
 <meta property="og:image:alt" content="Positive Good Vibes 로고와 긍정의밤 2026 초대장">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com">
+<script src="config.js"></script>
+<script>
+// Start the board request before fonts and the rest of the page finish loading.
+window.GJ_BOARD_REQUEST=function(){
+  const api=(window.GJ_API||'').trim();
+  if(!/^https:\/\/script\.google\.com\//.test(api))return Promise.resolve({error:new Error('noapi')});
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),18000);
+  return fetch(api+'?'+new URLSearchParams({a:'state',t:Date.now()}),{cache:'no-store',signal:controller.signal})
+    .then(r=>{if(!r.ok)throw Error('network');return r.json()})
+    .then(value=>({value}),error=>({error})).finally(()=>clearTimeout(timer));
+};
+window.GJ_BOARD_INITIAL=window.GJ_BOARD_REQUEST();
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -159,6 +174,7 @@ section{padding:50px 0 6px}
 .addrow input{flex:1;min-width:0}
 .addrow .btn{margin:0;white-space:nowrap}
 .arrival-pool{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.arrival-pool[hidden]{display:none}
 .arrival-pool .pchip{font-size:14px;padding:4px 9px 3px}
 .arrival-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
 .arrival-slot{min-width:0;padding:7px 8px 8px;background:var(--paper);color:var(--paper-ink);border:2px solid var(--line);border-radius:12px;box-shadow:3px 3px 0 var(--line)}
@@ -228,6 +244,13 @@ select{width:100%;font:inherit;font-size:16px;color:var(--paper-ink);background:
 .progress{font-family:var(--kr);font-size:16px;margin:10px 0 0}
 .sync{font-size:14px;color:var(--soft);margin:0 0 10px;min-height:1.2em}
 .sync.ok{color:var(--ink)}.sync.bad{color:var(--ink);font-weight:700}
+.load-status{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 14px;margin:14px 0;background:var(--paper);color:var(--paper-ink);border:2px dashed var(--line);border-radius:14px;font-size:14px;line-height:1.6}
+.load-status[hidden],.load-spinner[hidden],.load-retry[hidden]{display:none}
+.load-note{flex:1;min-width:180px}
+.load-spinner{width:18px;height:18px;flex:none;border:3px solid #DFD1F2;border-top-color:#7A4FD0;border-radius:50%;animation:load-spin .9s linear infinite}
+.load-retry{border:2px solid var(--line);border-radius:999px;background:var(--candy);color:var(--paper-ink);padding:8px 12px;font:15px var(--kr);cursor:pointer}
+@keyframes load-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.load-spinner{animation:none}}
 .nosrv{background:var(--paper);color:var(--paper-ink);border:3px dashed var(--line);border-radius:14px;padding:10px 14px;font-size:15px}
 .addrow select{flex:1;min-width:0}
 .note{font-size:14px;color:var(--paper-soft);margin:16px 0 0}
@@ -334,8 +357,9 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     </div>
 
     <p class="nosrv" id="nosrv" hidden>아직 서버가 연결되지 않았어. 연결되면 여기서 바로 이름을 넣을 수 있어.</p>
+    <div class="load-status" id="board-load" role="status"><span class="load-spinner" aria-hidden="true"></span><span class="load-note">할 일을 불러오는 중이야… 잠깐만 기다려줘 👻</span><button type="button" class="load-retry" hidden>다시 연결</button></div>
     <p class="sync" id="sync" aria-live="polite"></p>
-    <div class="board" id="board"></div>
+    <div class="board" id="board" aria-busy="true"></div>
 
     <div class="addtask sticker" id="addtask" hidden>
       <label for="t-new">할 일 추가</label>
@@ -351,9 +375,10 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
   <section id="arrival">
     <div class="sh"><h2>도착 예정 시간</h2><span class="tag">See you!</span></div>
     <p class="lede">내 이름을 고르고 도착할 시간대를 눌러줘. 이름을 끌어다 놓아도 돼!</p>
+    <div class="load-status" id="arrival-load" role="status"><span class="load-spinner" aria-hidden="true"></span><span class="load-note">도착 시간을 불러오는 중이야…</span><button type="button" class="load-retry" hidden>다시 연결</button></div>
     <div class="arrival-pool" id="arrival-pool" aria-label="도착 시간을 정할 이름" hidden></div>
     <p id="arrival-help">도착 시간을 불러오는 중…</p>
-    <div class="arrival-grid" id="arrival-grid" aria-label="도착 예정 시간별 명단"></div>
+    <div class="arrival-grid" id="arrival-grid" aria-label="도착 예정 시간별 명단" aria-busy="true"></div>
     <p class="sync" id="arrival-sync" aria-live="polite"></p>
   </section>
 
@@ -507,7 +532,6 @@ document.querySelectorAll('.ghost').forEach(g=>g.addEventListener('animationend'
 
 })();
 </script>
-<script src="config.js"></script>
 <script>
 (function(){
 const NAMES=['구세라','권경지','권순록','김강일','류원선','박재훈','서정윤','유세종','이대호','이수한','천수진'];
@@ -529,8 +553,14 @@ async function api(params,post){
   return j;
 }
 
-let S={board:{tasks:[{id:'staff',title:'운영진',people:[]}]},registered:[],started:false};
-let loaded=false;
+let S={board:{tasks:[]},registered:[],started:false};
+let loaded=false, cachedBoard=false;
+const BOARD_CACHE='gj26-board-cache-v1';
+try{
+  const c=JSON.parse(store.get(BOARD_CACHE));
+  if(c&&c.api===API&&Date.now()-c.at<7*86400000&&Array.isArray(c.board?.tasks)&&c.board.tasks.every(t=>typeof t.id==='string'&&typeof t.title==='string'&&Array.isArray(t.people))){S.board=c.board;cachedBoard=true}
+}catch(e){}
+function cacheBoard(){store.set(BOARD_CACHE,JSON.stringify({api:API,at:Date.now(),board:S.board}));cachedBoard=true}
 
 /* ---------- board ---------- */
 let selected=null, arrivalSelected=null, armed=null, pending=0, queue=Promise.resolve();
@@ -590,7 +620,7 @@ function send(op){
   applyLocal(op);renderBoard();renderAcks();renderArrivals();
   pending++;setSync('저장 중…');
   queue=queue.then(async()=>{
-    try{const j=await api({a:'board',op},true);pending--;if(!pending){S.board=j.board;S.registered=j.registered;S.started=j.started;renderAll();setSync('저장됨 ✓','ok')}}
+    try{const j=await api({a:'board',op},true);pending--;if(!pending){S.board=j.board;S.registered=j.registered;S.started=j.started;cacheBoard();renderAll();setSync('저장됨 ✓','ok')}}
     catch(e){pending--;setSync('저장하지 못했어. 새로고침 후 다시 해줘','bad');refresh()}
   });
 }
@@ -614,6 +644,7 @@ $('board').addEventListener('click',e=>{
 });
 let drag=null;
 function startDrag(e,scope){
+  if(!API||!loaded)return;
   const c=e.target.closest('.pchip');if(!c)return;
   drag={scope,i:+c.dataset.i,x:e.clientX,y:e.clientY,on:false,fl:null,over:null};
 }
@@ -658,6 +689,7 @@ function renderArrivals(){
   const active=document.activeElement, poolFocus=active?.closest('#arrival-pool .pchip'), slotFocus=active?.closest('.arrival-slot');
   const restoreName=poolFocus?.dataset.i,restoreHour=slotFocus?.dataset.hour;
   const pool=$('arrival-pool');pool.hidden=!live;pool.replaceChildren();
+  $('arrival-help').hidden=!live;
   NAMES.forEach((name,i)=>{const b=el('button','pchip'+(arrivalSelected===i?' sel':''),name);b.type='button';b.dataset.i=i;b.setAttribute('aria-pressed',String(arrivalSelected===i));pool.appendChild(b)});
   $('arrival-help').textContent=!live?(API?'도착 시간을 불러오는 중…':'서버가 연결되면 도착 시간을 정할 수 있어.'):arrivalSelected===null?'시간은 한 사람당 한 칸! 다른 시간을 고르면 자동으로 옮겨져.':NAMES[arrivalSelected]+' 선택됨. 도착할 시간대를 눌러줘.';
   const grid=$('arrival-grid');grid.replaceChildren();
@@ -675,7 +707,7 @@ function renderArrivals(){
   else if(restoreHour!==undefined)Array.from(grid.children).find(s=>s.dataset.hour===restoreHour)?.querySelector('.arrival-slot-button').focus({preventScroll:true});
 }
 $('arrival-pool').addEventListener('click',e=>{
-  if(e.detail!==0)return;
+  if(e.detail!==0||!API||!loaded)return;
   const b=e.target.closest('.pchip');if(!b)return;
   arrivalSelected=arrivalSelected===+b.dataset.i?null:+b.dataset.i;renderArrivals();
 });
@@ -830,11 +862,32 @@ window.addEventListener('hashchange',applyHash);applyHash();
 
 /* ---------- load & poll ---------- */
 function renderAll(){renderBoard();renderArrivals();renderManito();renderAcks()}
-async function refresh(){
-  if(!API){renderAll();$('nosrv').hidden=false;return}
-  try{const j=await api({a:'state'});if(!pending&&!drag){S=j;loaded=true;renderAll();ensureAcks()}}
-  catch(e){if(!loaded)setSync('서버에 연결하지 못했어. 잠시 후 새로고침해줘','bad')}
+let refreshing=false, firstState=window.GJ_BOARD_INITIAL;
+function loadStatus(mode){
+  ['board','arrival'].forEach(kind=>{
+    const box=$(kind+'-load'),name=kind==='board'?'할 일':'도착 시간';
+    box.hidden=mode==='done'||mode==='none';
+    box.querySelector('.load-spinner').hidden=mode==='error';
+    box.querySelector('.load-retry').hidden=mode!=='error';
+    box.querySelector('.load-note').textContent=mode==='error'?'연결이 늦어지고 있어. 잠시 후 다시 연결해줘.':mode==='slow'?'서버에서 '+name+'을 가져오는 중이야. 조금만 더 기다려줘 👻':cachedBoard?'마지막으로 본 '+name+'이야. 최신 내용을 확인하고 있어…':name+'을 불러오는 중이야… 잠깐만 기다려줘 👻';
+  });
+  ['board','arrival-grid'].forEach(id=>$(id).setAttribute('aria-busy',String(mode==='loading'||mode==='slow')));
 }
+async function refresh(){
+  if(!API){renderAll();loadStatus('none');$('nosrv').hidden=false;return}
+  if(refreshing||pending||drag)return;
+  refreshing=true;
+  if(!loaded)loadStatus('loading');
+  const slow=setTimeout(()=>{if(!loaded)loadStatus('slow')},6000);
+  try{
+    const request=firstState||window.GJ_BOARD_REQUEST();firstState=null;
+    const result=await request;if(result.error)throw result.error;
+    const j=result.value;if(!j.ok)throw Error(j.err);
+    if(!pending&&!drag){S=j;loaded=true;cacheBoard();renderAll();loadStatus('done');ensureAcks()}
+  }catch(e){if(!loaded)loadStatus('error')}
+  finally{clearTimeout(slow);refreshing=false}
+}
+document.querySelectorAll('.load-retry').forEach(b=>b.addEventListener('click',refresh));
 renderAll();refresh();
 setInterval(()=>{if(document.visibilityState==='visible')refresh()},20000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
