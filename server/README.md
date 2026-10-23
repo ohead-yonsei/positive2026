@@ -44,3 +44,24 @@ function giftAction(q) {
 ```
 
 색 변경은 이름 추가/빼기나 카드 삭제와 독립적이다. 운영진 카드도 색을 바꿀 수 있고, 삭제 제한은 유지한다.
+
+# 도착 예정 시간
+
+`board.arrivals`는 참가자 index 0~10 순서의 배열이며, 값은 미정인 `null` 또는 13~19시다.
+19는 '19시 이후'를 뜻한다. 기존 board에 배열이 없어도 빈 시간표로 표시한다.
+`Code.gs`의 같은 `case 'board'`에서 `bad_op` 분기 바로 앞에 다음을 추가한다.
+
+```js
+      else if (op.type === 'setArrival' || op.type === 'removeArrival') {
+        const i = idx(op.i);
+        if (!Number.isInteger(op.hour) || op.hour < 13 || op.hour > 19) return fail('bad_hour');
+        if (!Array.isArray(b.arrivals)) b.arrivals = Array(N).fill(null);
+        if (op.type === 'setArrival') b.arrivals[i] = op.hour;
+        else if (b.arrivals[i] === op.hour) b.arrivals[i] = null;
+      }
+```
+
+이름 선택 후 시간대를 누르거나 이름을 끌어 놓으면 자동 저장한다. 각 이름은 시간 하나만 갖고,
+시간을 바꾸면 기존 칸에서 이동한다. 취소는 요청에 담긴 시간과 현재 시간이 일치할 때만 적용해
+다른 브라우저에서 방금 변경한 시간을 오래된 화면의 × 버튼이 지우지 않게 한다.
+할 일과 동일한 ScriptLock과 저장 큐를 사용하며, 20초마다 다른 브라우저의 변경을 불러온다.

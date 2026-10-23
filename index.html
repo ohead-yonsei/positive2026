@@ -158,6 +158,24 @@ section{padding:50px 0 6px}
 .addrow{display:flex;gap:10px;align-items:stretch}
 .addrow input{flex:1;min-width:0}
 .addrow .btn{margin:0;white-space:nowrap}
+.arrival-pool{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.arrival-pool .pchip{font-size:14px;padding:4px 9px 3px}
+.arrival-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.arrival-slot{min-width:0;padding:7px 8px 8px;background:var(--paper);color:var(--paper-ink);border:2px solid var(--line);border-radius:12px;box-shadow:3px 3px 0 var(--line)}
+.arrival-slot:nth-child(3n+1){background:#DFD1F2}
+.arrival-slot:nth-child(3n+2){background:#D8EDB3}
+.arrival-slot:last-child{grid-column:1/-1}
+.arrival-slot.over,.arrival-slot.target{outline:2px dashed var(--pumpkin);outline-offset:2px}
+.arrival-slot-button{display:flex;align-items:center;justify-content:space-between;gap:4px;width:100%;min-height:32px;padding:0;border:0;background:none;color:inherit;font:18px var(--kr);text-align:left;cursor:pointer}
+.arrival-slot-button:disabled{cursor:default}
+.arrival-slot-button small{font:12px var(--body);opacity:.75}
+.arrival-names{display:flex;flex-wrap:wrap;gap:4px;list-style:none;margin:4px 0 0;padding:0;min-height:28px}
+.arrival-names li{display:inline-flex;align-items:center;gap:1px;padding:0 1px 0 7px;background:#fff;border:1.5px solid var(--line);border-radius:999px;font:13px var(--kr)}
+.arrival-names .empty{padding:2px 0;border:0;background:none;color:var(--paper-soft);font:12px var(--body)}
+.arrival-names button{width:28px;height:28px;padding:0;border:0;border-radius:50%;background:none;color:var(--paper-soft);font:17px var(--body);cursor:pointer}
+.arrival-names li.only{padding-right:7px}
+#arrival-help{font-size:13px;line-height:1.5;color:var(--soft);margin:8px 0}
+#arrival-sync{margin:8px 0 0;font-size:13px}
 .savebar{position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:40;width:min(460px,calc(100% - 24px));display:flex;align-items:center;justify-content:space-between;gap:12px;
   background:var(--paper);color:var(--paper-ink);border:3px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 0 var(--line);font-family:var(--kr);font-size:16px}
 .savebar[hidden]{display:none}
@@ -329,6 +347,15 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
   </section>
 
 
+
+  <section id="arrival">
+    <div class="sh"><h2>도착 예정 시간</h2><span class="tag">See you!</span></div>
+    <p class="lede">내 이름을 고르고 도착할 시간대를 눌러줘. 이름을 끌어다 놓아도 돼!</p>
+    <div class="arrival-pool" id="arrival-pool" aria-label="도착 시간을 정할 이름" hidden></div>
+    <p id="arrival-help">도착 시간을 불러오는 중…</p>
+    <div class="arrival-grid" id="arrival-grid" aria-label="도착 예정 시간별 명단"></div>
+    <p class="sync" id="arrival-sync" aria-live="polite"></p>
+  </section>
 
   <section id="night">
     <div class="sh"><h2>그날 밤 순서</h2><span class="tag">Tonight</span></div>
@@ -506,10 +533,12 @@ let S={board:{tasks:[{id:'staff',title:'운영진',people:[]}]},registered:[],st
 let loaded=false;
 
 /* ---------- board ---------- */
-let selected=null, armed=null, pending=0, queue=Promise.resolve();
+let selected=null, arrivalSelected=null, armed=null, pending=0, queue=Promise.resolve();
+const ARRIVAL_HOURS=[13,14,15,16,17,18,19];
+const arrivalLabel=hour=>hour===19?'19시 이후':hour+'시';
 const TASK_COLORS=[['cream','크림'],['yellow','노랑'],['mint','연두'],['lavender','라벤더']];
 const taskColor=t=>TASK_COLORS.some(([key])=>key===t.color)?t.color:t.id==='staff'?'yellow':'cream';
-function setSync(t,cls){const s=$('sync');s.textContent=t;s.className='sync'+(cls?' '+cls:'')}
+function setSync(t,cls){['sync','arrival-sync'].forEach(id=>{const s=$(id);s.textContent=t;s.className='sync'+(cls?' '+cls:'')})}
 
 function renderBoard(){
   const live=!!API&&loaded;
@@ -549,11 +578,16 @@ function applyLocal(op){
   if(op.type==='add'&&t&&!t.people.includes(op.i)) t.people.push(op.i);
   else if(op.type==='remove'&&t) t.people=t.people.filter(p=>p!==op.i);
   else if(op.type==='setColor'&&t&&TASK_COLORS.some(([key])=>key===op.color)) t.color=op.color;
+  else if(op.type==='setArrival'||op.type==='removeArrival'){
+    if(!Array.isArray(b.arrivals))b.arrivals=Array(N).fill(null);
+    if(op.type==='setArrival')b.arrivals[op.i]=op.hour;
+    else if(b.arrivals[op.i]===op.hour)b.arrivals[op.i]=null;
+  }
   else if(op.type==='addTask') b.tasks.push({id:op.id,title:op.title,people:[]});
   else if(op.type==='delTask') b.tasks=b.tasks.filter(x=>x.id!==op.tid);
 }
 function send(op){
-  applyLocal(op);renderBoard();renderAcks();
+  applyLocal(op);renderBoard();renderAcks();renderArrivals();
   pending++;setSync('저장 중…');
   queue=queue.then(async()=>{
     try{const j=await api({a:'board',op},true);pending--;if(!pending){S.board=j.board;S.registered=j.registered;S.started=j.started;renderAll();setSync('저장됨 ✓','ok')}}
@@ -579,18 +613,20 @@ $('board').addEventListener('click',e=>{
   if(card&&selected!==null){const i=selected;selected=null;send({type:'add',tid:card.dataset.id,i})}
 });
 let drag=null;
-$('pool').addEventListener('pointerdown',e=>{
+function startDrag(e,scope){
   const c=e.target.closest('.pchip');if(!c)return;
-  drag={i:+c.dataset.i,x:e.clientX,y:e.clientY,on:false,fl:null,over:null};
-});
-function taskAt(x,y){const t=document.elementFromPoint(x,y);return t?t.closest('.task'):null}
+  drag={scope,i:+c.dataset.i,x:e.clientX,y:e.clientY,on:false,fl:null,over:null};
+}
+$('pool').addEventListener('pointerdown',e=>startDrag(e,'task'));
+$('arrival-pool').addEventListener('pointerdown',e=>startDrag(e,'arrival'));
+function dropAt(x,y,scope){const t=document.elementFromPoint(x,y);return t?t.closest(scope==='arrival'?'.arrival-slot':'.task'):null}
 document.addEventListener('pointermove',e=>{
   if(!drag)return;
   if(!drag.on&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6){drag.on=true;drag.fl=el('div','floater',NAMES[drag.i]);document.body.appendChild(drag.fl)}
   if(!drag.on)return;
   e.preventDefault();
   drag.fl.style.left=e.clientX+'px';drag.fl.style.top=e.clientY+'px';
-  const t=taskAt(e.clientX,e.clientY);
+  const t=dropAt(e.clientX,e.clientY,drag.scope);
   if(drag.over&&drag.over!==t)drag.over.classList.remove('over');
   if(t)t.classList.add('over');drag.over=t;
   if(e.clientY<70)window.scrollBy(0,-12);else if(e.clientY>innerHeight-70)window.scrollBy(0,12);
@@ -599,7 +635,11 @@ function endDrag(e,cancel){
   if(!drag)return;const d=drag;drag=null;
   if(d.fl)d.fl.remove();if(d.over)d.over.classList.remove('over');
   if(cancel)return;
-  if(d.on){const t=taskAt(e.clientX,e.clientY);if(t){selected=null;send({type:'add',tid:t.dataset.id,i:d.i})}}
+  if(d.on){const t=dropAt(e.clientX,e.clientY,d.scope);if(t){
+    if(d.scope==='arrival'){arrivalSelected=null;send({type:'setArrival',i:d.i,hour:+t.dataset.hour})}
+    else{selected=null;send({type:'add',tid:t.dataset.id,i:d.i})}
+  }}
+  else if(d.scope==='arrival'){arrivalSelected=arrivalSelected===d.i?null:d.i;renderArrivals()}
   else{selected=(selected===d.i?null:d.i);renderBoard()}
 }
 document.addEventListener('pointerup',e=>endDrag(e,false));
@@ -611,6 +651,42 @@ function addTask(){
 }
 $('t-add').addEventListener('click',addTask);
 $('t-new').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();addTask()}});
+
+/* ---------- 도착 예정 시간 ---------- */
+function renderArrivals(){
+  const live=!!API&&loaded, values=Array.isArray(S.board.arrivals)?S.board.arrivals:[];
+  const active=document.activeElement, poolFocus=active?.closest('#arrival-pool .pchip'), slotFocus=active?.closest('.arrival-slot');
+  const restoreName=poolFocus?.dataset.i,restoreHour=slotFocus?.dataset.hour;
+  const pool=$('arrival-pool');pool.hidden=!live;pool.replaceChildren();
+  NAMES.forEach((name,i)=>{const b=el('button','pchip'+(arrivalSelected===i?' sel':''),name);b.type='button';b.dataset.i=i;b.setAttribute('aria-pressed',String(arrivalSelected===i));pool.appendChild(b)});
+  $('arrival-help').textContent=!live?(API?'도착 시간을 불러오는 중…':'서버가 연결되면 도착 시간을 정할 수 있어.'):arrivalSelected===null?'시간은 한 사람당 한 칸! 다른 시간을 고르면 자동으로 옮겨져.':NAMES[arrivalSelected]+' 선택됨. 도착할 시간대를 눌러줘.';
+  const grid=$('arrival-grid');grid.replaceChildren();
+  ARRIVAL_HOURS.forEach(hour=>{
+    const people=NAMES.map((_,i)=>i).filter(i=>values[i]===hour),label=arrivalLabel(hour);
+    const slot=el('div','arrival-slot'+(live&&arrivalSelected!==null?' target':''));slot.dataset.hour=hour;
+    const button=el('button','arrival-slot-button');button.type='button';button.disabled=!live;button.setAttribute('aria-label',label+' 도착 시간 선택');
+    button.append(el('span',null,label),el('small',null,people.length+'명'));
+    const ul=el('ul','arrival-names');ul.setAttribute('aria-label',label+' 도착 예정');
+    if(!people.length)ul.appendChild(el('li','empty','아직 없어'));
+    people.forEach(i=>{const li=el('li',live?'':'only',NAMES[i]);if(live){const remove=el('button',null,'×');remove.type='button';remove.dataset.arrivalRemove=i;remove.setAttribute('aria-label',NAMES[i]+' '+label+' 도착 취소');li.appendChild(remove)}ul.appendChild(li)});
+    slot.append(button,ul);grid.appendChild(slot);
+  });
+  if(restoreName!==undefined)Array.from(pool.children).find(b=>b.dataset.i===restoreName)?.focus({preventScroll:true});
+  else if(restoreHour!==undefined)Array.from(grid.children).find(s=>s.dataset.hour===restoreHour)?.querySelector('.arrival-slot-button').focus({preventScroll:true});
+}
+$('arrival-pool').addEventListener('click',e=>{
+  if(e.detail!==0)return;
+  const b=e.target.closest('.pchip');if(!b)return;
+  arrivalSelected=arrivalSelected===+b.dataset.i?null:+b.dataset.i;renderArrivals();
+});
+$('arrival-grid').addEventListener('click',e=>{
+  if(!API||!loaded)return;
+  const slot=e.target.closest('.arrival-slot');if(!slot)return;
+  const hour=+slot.dataset.hour,remove=e.target.closest('[data-arrival-remove]');
+  if(remove){send({type:'removeArrival',i:+remove.dataset.arrivalRemove,hour});return}
+  if(arrivalSelected===null){$('arrival-help').textContent='위에서 내 이름을 먼저 골라줘.';return}
+  const i=arrivalSelected;arrivalSelected=null;send({type:'setArrival',i,hour});
+});
 
 /* ---------- 가져올 것 확인 ---------- */
 const ACKS=[['ack-ttk','떡볶이 확인'],['ack-daiso','다이소 확인']];
@@ -753,7 +829,7 @@ function applyHash(){$('m-admin').hidden=location.hash!=='#admin';if(location.ha
 window.addEventListener('hashchange',applyHash);applyHash();
 
 /* ---------- load & poll ---------- */
-function renderAll(){renderBoard();renderManito();renderAcks()}
+function renderAll(){renderBoard();renderArrivals();renderManito();renderAcks()}
 async function refresh(){
   if(!API){renderAll();$('nosrv').hidden=false;return}
   try{const j=await api({a:'state'});if(!pending&&!drag){S=j;loaded=true;renderAll();ensureAcks()}}
