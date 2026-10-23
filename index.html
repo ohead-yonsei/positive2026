@@ -686,12 +686,14 @@ $('t-new').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.
 /* ---------- 도착 예정 시간 ---------- */
 function renderArrivals(){
   const live=!!API&&loaded, values=Array.isArray(S.board.arrivals)?S.board.arrivals:[];
+  const available=NAMES.map((_,i)=>i).filter(i=>!ARRIVAL_HOURS.includes(values[i]));
+  if(arrivalSelected!==null&&!available.includes(arrivalSelected))arrivalSelected=null;
   const active=document.activeElement, poolFocus=active?.closest('#arrival-pool .pchip'), slotFocus=active?.closest('.arrival-slot');
   const restoreName=poolFocus?.dataset.i,restoreHour=slotFocus?.dataset.hour;
-  const pool=$('arrival-pool');pool.hidden=!live;pool.replaceChildren();
+  const pool=$('arrival-pool');pool.hidden=!live||!available.length;pool.replaceChildren();
   $('arrival-help').hidden=!live;
-  NAMES.forEach((name,i)=>{const b=el('button','pchip'+(arrivalSelected===i?' sel':''),name);b.type='button';b.dataset.i=i;b.setAttribute('aria-pressed',String(arrivalSelected===i));pool.appendChild(b)});
-  $('arrival-help').textContent=!live?(API?'도착 시간을 불러오는 중…':'서버가 연결되면 도착 시간을 정할 수 있어.'):arrivalSelected===null?'시간은 한 사람당 한 칸! 다른 시간을 고르면 자동으로 옮겨져.':NAMES[arrivalSelected]+' 선택됨. 도착할 시간대를 눌러줘.';
+  available.forEach(i=>{const b=el('button','pchip'+(arrivalSelected===i?' sel':''),NAMES[i]);b.type='button';b.dataset.i=i;b.setAttribute('aria-pressed',String(arrivalSelected===i));pool.appendChild(b)});
+  $('arrival-help').textContent=!live?(API?'도착 시간을 불러오는 중…':'서버가 연결되면 도착 시간을 정할 수 있어.'):!available.length?'모두 도착 시간을 정했어! 바꾸려면 이름 옆 ×로 빼고 다시 골라줘.':arrivalSelected===null?'시간을 정한 이름은 위 목록에서 사라져. 시간 변경은 ×로 빼고 다시 골라줘.':NAMES[arrivalSelected]+' 선택됨. 도착할 시간대를 눌러줘.';
   const grid=$('arrival-grid');grid.replaceChildren();
   ARRIVAL_HOURS.forEach(hour=>{
     const people=NAMES.map((_,i)=>i).filter(i=>values[i]===hour),label=arrivalLabel(hour);
