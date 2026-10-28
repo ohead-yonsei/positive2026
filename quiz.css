@@ -1,0 +1,45 @@
+#quiz [hidden],#event-admin[hidden],#event-admin [hidden]{display:none!important}
+.quiz-card,.event-admin-card{padding:22px;color:var(--paper-ink)}
+.quiz-top{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.quiz-pill{font:15px var(--kr);padding:4px 10px;border:2px solid var(--line);border-radius:99px;background:#EADFF5}
+.quiz-title{font:26px/1.4 var(--kr);margin:18px 0 12px;word-break:keep-all}
+.quiz-note{font-size:14px;color:var(--paper-soft);word-break:keep-all;margin:10px 0}
+.quiz-people{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:12px 0}
+.quiz-people li{font:14px var(--kr);background:#E6F1CF;border:2px solid var(--line);border-radius:99px;padding:4px 9px}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.quiz-option{min-height:60px;border:2px solid var(--line);border-radius:12px;background:#fff;font:18px/1.5 var(--kr);color:var(--paper-ink);padding:12px;cursor:pointer;overflow-wrap:anywhere}
+.quiz-option[aria-pressed="true"]{background:var(--candy);box-shadow:3px 3px 0 var(--line)}
+.quiz-order{list-style:none;padding:0;margin:18px 0;counter-reset:quizorder}
+.quiz-order li{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px dashed #CABEA8;counter-increment:quizorder}
+.quiz-order li::before{content:counter(quizorder);font:18px var(--marker);width:22px;flex:none}
+.quiz-order li>span{flex:1;min-width:0;overflow-wrap:anywhere;font:17px/1.4 var(--kr)}
+.quiz-move{width:40px;height:44px;flex:none;border:2px solid var(--line);border-radius:10px;background:#EADFF5;font:20px var(--kr);color:var(--paper-ink);cursor:pointer}
+.quiz-feedback{background:#E6F1CF;border:2px solid var(--line);border-radius:14px;padding:16px;margin:16px 0;word-break:keep-all}
+.quiz-feedback h4{font:22px var(--kr);margin:0 0 8px}
+.quiz-feedback p{margin:6px 0;font-size:15px}
+.quiz-feedback.wrong{background:#FFF1C4}
+.quiz-card .btn{width:100%}
+.quiz-card .btn.ghosty{width:auto}
+#quiz button:disabled,#event-admin button:disabled{opacity:.5;cursor:default}
+.quiz-ranking{list-style:none;padding:0;margin:14px 0}
+.quiz-ranking li{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:12px 8px;border-top:1px dashed #CABEA8;font:20px var(--kr)}
+.quiz-ranking li.mine{background:#FFF1C4;border-radius:10px}
+.quiz-ranking small{display:block;font:13px var(--body);color:var(--paper-soft);margin-top:3px}
+.event-admin-card h3{font:24px var(--kr);margin:0 0 12px}
+.event-admin-card h4{font:21px var(--kr);margin:18px 0 8px}
+.event-admin-card textarea{width:100%;resize:vertical;font:16px/1.6 var(--body);color:var(--paper-ink);background:#fff;border:2px solid var(--line);border-radius:10px;padding:10px}
+.event-admin-card select,.event-admin-card input{border-width:2px}
+.event-admin-card .btn{font-size:17px;margin:8px 6px 0 0;padding:10px 14px}
+.quiz-admin-section{border-top:2px dashed #CABEA8;margin-top:20px;padding-top:16px}
+.quiz-admin-summary{font:18px/1.5 var(--kr);word-break:keep-all}
+.quiz-edit-list{list-style:none;padding:0;margin:12px 0}
+.quiz-edit-list li{border:2px solid var(--line);border-radius:12px;background:#EADFF5;padding:12px;margin:8px 0}
+.quiz-edit-list p{font:17px/1.5 var(--kr);margin:0;overflow-wrap:anywhere}
+.quiz-edit-list small{display:block;font:13px/1.5 var(--body);margin:6px 0;overflow-wrap:anywhere}
+.quiz-edit-list button{border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:36px;margin:3px 4px 0 0;font:14px var(--kr);background:#fff;color:var(--paper-ink);cursor:pointer}
+.quiz-editor{border:2px solid var(--line);border-radius:12px;background:#FFF1C4;padding:14px}
+.quiz-editor label{margin-top:12px}
+.quiz-admin-confirm{margin-top:16px;padding:14px;border:3px solid var(--line);border-radius:12px;background:#FFE0B5}
+.quiz-admin-confirm p{font:18px/1.5 var(--kr);margin:0}
+.event-admin-card details>summary{font:20px var(--kr);cursor:pointer;padding:12px 0}
+@media(max-width:360px){.quiz-card,.event-admin-card{padding:16px}.quiz-options{gap:8px}.quiz-option{font-size:16px;padding:10px}}

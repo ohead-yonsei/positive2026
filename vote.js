@@ -118,6 +118,7 @@ $('vote-send').addEventListener('click',async()=>{
   }finally{sending=false;render()}
 });
 $('vote-retry').addEventListener('click',()=>load());
+document.addEventListener('gj-vote-revealed',e=>{apply(e.detail);message('투표가 마감됐어. 공개된 결과를 확인해봐!')});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')load()});
 if('IntersectionObserver' in window)new IntersectionObserver(entries=>{visible=entries[0].isIntersecting},{rootMargin:'200px'}).observe($('vote'));
 setInterval(clock,1000);

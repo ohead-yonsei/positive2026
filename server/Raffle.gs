@@ -55,7 +55,8 @@ function raffleRandom_(total) {
 }
 function raffleAction(q) {
   // Reuse the existing locked event route without touching private Code.gs.
-  if (q.op === 'voteStatus' || q.op === 'voteSubmit') return voteAction(q);
+  if (['voteStatus','voteSubmit','voteReveal'].indexOf(q.op) >= 0) return voteAction(q);
+  if (typeof q.op === 'string' && q.op.indexOf('quiz') === 0) return quizAction(q);
   const p = PropertiesService.getScriptProperties();
   if (q.op === 'status') return rafflePublic_();
   if (q.op === 'claim') return {ok:false, err:'raffle_only'};

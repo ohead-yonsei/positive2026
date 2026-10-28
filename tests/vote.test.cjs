@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const DEADLINE=Date.parse('2026-10-31T21:00:00+09:00');
 function setup(){
   let time=DEADLINE-1000;const data=new Map();
-  const ctx=vm.createContext({Date:class extends Date{static now(){return time}},PropertiesService:{getScriptProperties:()=>({getProperty:k=>data.get(k)||null,setProperty:(k,v)=>data.set(k,v)})}});
+  const ctx=vm.createContext({isAdmin:q=>q.pw==='test-only-password',Date:class extends Date{static now(){return time}},PropertiesService:{getScriptProperties:()=>({getProperty:k=>data.get(k)||null,setProperty:(k,v)=>data.set(k,v)})}});
   vm.runInContext(fs.readFileSync('server/Vote.gs','utf8')+'\n'+fs.readFileSync('server/Raffle.gs','utf8'),ctx);
   const call=q=>JSON.parse(JSON.stringify(ctx.raffleAction(q)));
   return{data,call,status:()=>call({op:'voteStatus'}),submit:(i,choices=[0,1,2])=>call({op:'voteSubmit',i,choices}),setTime:t=>time=t};
@@ -44,4 +44,12 @@ test('empty results have no false winner; unrelated production properties remain
   const s=setup();s.data.set('board','KEEP');s.data.set('gift','KEEP');s.setTime(DEADLINE);
   assert.deepEqual(s.status().results,Array.from({length:3},()=>Array(11).fill(0)));
   assert.equal(s.data.get('board'),'KEEP');assert.equal(s.data.get('gift'),'KEEP');
+});
+
+test('early reveal requires admin, closes voting, and cannot be undone by the clock',()=>{
+ const s=setup();s.submit(0);assert.equal(s.call({op:'voteReveal',pw:'wrong'}).err,'badpw');assert.equal(s.status().phase,'open');
+ const opened=s.call({op:'voteReveal',pw:'test-only-password'});assert.equal(opened.phase,'revealed');assert.equal(opened.results[0][0],1);
+ assert.equal(s.submit(1).err,'vote_closed');const saved=s.data.get('positive_awards_2026_opened_at');
+ s.setTime(DEADLINE-5000);assert.equal(s.call({op:'voteReveal',pw:'test-only-password'}).phase,'revealed');assert.equal(s.data.get('positive_awards_2026_opened_at'),saved);
+ assert.equal(s.submit(0).alreadyVoted,true);
 });

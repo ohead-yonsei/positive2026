@@ -31,7 +31,8 @@ window.GJ_BOARD_REQUEST=function(){
 window.GJ_BOARD_INITIAL=window.GJ_BOARD_REQUEST();
 </script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="vote.css?v=20261028-1">
+<link rel="stylesheet" href="vote.css?v=20261028-2">
+<link rel="stylesheet" href="quiz.css?v=20261028-1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Permanent+Marker&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -434,8 +435,78 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
       <div id="vote-results" hidden></div>
       <p class="msg" id="vote-status" role="status">투표함을 불러오는 중이야…</p>
       <button class="btn ghosty" id="vote-retry" type="button">현황 새로고침</button>
-      <p class="vote-note">공개 전에는 득표수와 순위를 볼 수 없어.<br>공개 후에도 누가 누구를 뽑았는지는 표시하지 않아.</p>
+      <p class="vote-note">운영진이 현장에서 먼저 공개할 수도 있어.<br>공개 전에는 득표수와 순위를 볼 수 없어.<br>공개 후에도 누가 누구를 뽑았는지는 표시하지 않아.</p>
       <noscript><p>투표하려면 브라우저의 자바스크립트를 켜줘.</p></noscript>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <div class="sh"><h2>긍정 퀴즈쇼</h2><span class="tag">Quiz time!</span></div>
+    <p class="lede">각자 폰을 들고 함께 풀어보자. 마지막엔 우리의 퀴즈왕을 공개해!</p>
+    <div class="sticker quiz-card">
+      <div class="quiz-top"><span id="quiz-phase" class="quiz-pill">연결 중…</span><span id="quiz-count" class="quiz-note"></span></div>
+      <h3 id="quiz-title" class="quiz-title">운영진이 시작하면 열려!</h3>
+      <p id="quiz-intro" class="quiz-note">O/X · 4지선다 · 순서 맞히기<br>문제당 10점, 최종 점수로 순위를 매겨. 동점은 공동 순위!</p>
+      <div id="quiz-entry" hidden>
+        <label for="quiz-name">참여할 내 이름</label>
+        <select id="quiz-name" disabled></select>
+        <button class="btn" type="button" id="quiz-join" disabled>이 이름으로 입장</button>
+        <p class="quiz-note">본인 이름으로 참여해줘. 브라우저가 바뀌어도 같은 이름으로 이어갈 수 있어.</p>
+      </div>
+      <ul id="quiz-people" class="quiz-people" aria-label="퀴즈 참가자"></ul>
+      <div id="quiz-play" hidden>
+        <p class="quiz-note" id="quiz-help"></p>
+        <div id="quiz-answers"></div>
+        <button class="btn" id="quiz-submit" type="button" disabled>답안 제출</button>
+        <div id="quiz-feedback" class="quiz-feedback" hidden></div>
+      </div>
+      <div id="quiz-results" hidden><p id="quiz-final-note" class="quiz-note"></p><ol id="quiz-ranking" class="quiz-ranking"></ol></div>
+      <p id="quiz-status" class="msg" role="status">퀴즈 진행 상황을 불러오는 중…</p>
+      <button class="btn ghosty" id="quiz-retry" type="button">다시 연결</button>
+    </div>
+  </section>
+
+  <section id="event-admin" hidden>
+    <div class="sh"><h2>운영진 진행실</h2><span class="tag">Admin</span></div>
+    <div class="sticker event-admin-card">
+      <div id="qa-login"><label for="qa-pw">운영진 비밀번호</label><input id="qa-pw" type="password" autocomplete="off"><button class="btn" id="qa-auth" type="button">운영진 연결</button></div>
+      <p class="msg" id="qa-status" role="status">운영진 비밀번호로 퀴즈와 투표 공개를 진행해줘.</p>
+      <div id="qa-body" hidden>
+        <button class="btn ghosty" id="qa-refresh" type="button">진행 상황 새로고침</button>
+        <button class="btn ghosty" id="qa-logout" type="button">운영진 연결 해제</button>
+        <div class="quiz-admin-section">
+          <h3>투표 결과 공개</h3><p class="quiz-note" id="qa-vote-state">투표 현황을 확인하는 중…</p>
+          <button class="btn" id="qa-vote-open" type="button">투표 마감 · 결과 미리 공개</button>
+          <p class="quiz-note">공개하면 투표가 즉시 마감되고 다시 숨길 수 없어. 미리 공개하지 않으면 10월 31일 밤 9시에 자동 공개돼.</p>
+        </div>
+        <div class="quiz-admin-section">
+          <h3>퀴즈 진행</h3><p id="qa-summary" class="quiz-admin-summary"></p>
+          <button class="btn" id="qa-open" type="button">퀴즈 시작 · 입장 열기</button>
+          <button class="btn" id="qa-question" type="button" hidden>첫 문제 시작</button>
+          <button class="btn" id="qa-reveal" type="button" hidden>답안 마감 · 정답 공개</button>
+          <button class="btn" id="qa-next" type="button" hidden>다음 문제</button>
+          <button class="btn" id="qa-finish" type="button" hidden>퀴즈 종료 · 최종 순위 공개</button>
+          <button class="btn ghosty" id="qa-prepare" type="button" hidden>새 게임 준비</button>
+          <p class="quiz-note">입장을 열고 친구들이 들어오면 첫 문제를 시작해줘. 제출 현황을 보며 정답을 공개하고 다음 문제로 넘어가면 돼.</p>
+        </div>
+        <div id="qa-confirm" class="quiz-admin-confirm" hidden><p id="qa-confirm-text"></p><button class="btn" id="qa-confirm-go" type="button">진행하기</button><button class="btn ghosty" id="qa-confirm-cancel" type="button">취소</button></div>
+        <details class="quiz-admin-section" id="qa-editor-details">
+          <summary>퀴즈 문제 만들기 · 수정</summary>
+          <p class="quiz-note" id="qa-draft-note"></p>
+          <ol class="quiz-edit-list" id="qa-list"></ol>
+          <div class="quiz-editor" id="qa-editor">
+            <h4 id="qa-editor-title">새 문제 추가</h4>
+            <label for="qa-type">문제 유형</label><select id="qa-type"><option value="ox">O/X</option><option value="choice">4지선다</option><option value="order">순서대로 배치</option></select>
+            <label for="qa-prompt">문제</label><textarea id="qa-prompt" rows="2" maxlength="200"></textarea>
+            <div id="qa-options-wrap" hidden><label for="qa-options" id="qa-options-label">보기 · 한 줄에 하나씩</label><textarea id="qa-options" rows="4"></textarea></div>
+            <div id="qa-answer-wrap"><label for="qa-answer">정답</label><select id="qa-answer"></select></div>
+            <label for="qa-explanation">정답 공개 때 보여줄 설명 (선택)</label><textarea id="qa-explanation" rows="2" maxlength="500"></textarea>
+            <button class="btn" id="qa-add" type="button">목록에 추가</button><button class="btn ghosty" id="qa-cancel-edit" type="button" hidden>수정 취소</button>
+          </div>
+          <p class="quiz-note" id="qa-unsaved"></p><button class="btn" id="qa-save" type="button">문제 목록 저장</button>
+          <p class="quiz-note">최대 20문제. 순서 문제는 정답 순서로 입력하면 참가자에게는 섞어서 보여줘. 게임 중에는 문제를 바꿀 수 없어.</p>
+        </details>
+      </div>
     </div>
   </section>
 
@@ -915,7 +986,7 @@ $('ad-reset').addEventListener('click',async()=>{
   catch(e){msg('ad-msg',e.code==='badpw'?'운영진 비밀번호가 틀렸어.':'문제가 생겼어. 잠시 후 다시 해줘.','bad')}
   renderManito();
 });
-function applyHash(){$('m-admin').hidden=location.hash!=='#admin';if(location.hash==='#admin')requestAnimationFrame(()=>$('manito').scrollIntoView({block:'start'}))}
+function applyHash(){$('m-admin').hidden=location.hash!=='#admin';if(location.hash==='#admin')requestAnimationFrame(()=>($('event-admin')||$('manito')).scrollIntoView({block:'start'}))}
 window.addEventListener('hashchange',applyHash);applyHash();
 
 /* ---------- load & poll ---------- */
@@ -952,6 +1023,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 })();
 </script>
 <script src="raffle.js?v=20261023-2"></script>
-<script src="vote.js?v=20261028-1"></script>
+<script src="vote.js?v=20261028-2"></script>
+<script src="quiz.js?v=20261028-1"></script>
 </body>
 </html>
