@@ -54,6 +54,8 @@ function raffleRandom_(total) {
   return n % total;
 }
 function raffleAction(q) {
+  // Reuse the existing locked event route without touching private Code.gs.
+  if (q.op === 'voteStatus' || q.op === 'voteSubmit') return voteAction(q);
   const p = PropertiesService.getScriptProperties();
   if (q.op === 'status') return rafflePublic_();
   if (q.op === 'claim') return {ok:false, err:'raffle_only'};

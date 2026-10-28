@@ -1,0 +1,32 @@
+#vote [hidden]{display:none!important}
+.vote-card{padding:22px;color:var(--paper-ink)}
+.vote-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.vote-kicker{font:18px var(--marker);margin:0}
+.vote-total{font:15px var(--kr);background:var(--candy);border:2px solid var(--line);border-radius:999px;padding:4px 10px}
+.vote-date{font:22px/1.35 var(--kr);margin:18px 0 6px;word-break:keep-all}
+.vote-clock{font-size:14px;color:var(--paper-soft);margin:0 0 18px;min-height:24px}
+.vote-note{font-size:14px;color:var(--paper-soft);margin:10px 0;word-break:keep-all}
+.vote-question{border:2px solid var(--line);border-radius:14px;margin:14px 0;padding:14px;background:#FFF1C4}
+.vote-question:nth-child(2){background:#E6F1CF}
+.vote-question:nth-child(3){background:#EADFF5}
+.vote-question label,.vote-question h3{font:20px/1.45 var(--kr);margin:0 0 10px;word-break:keep-all}
+.vote-question small{display:block;font:13px var(--body);margin-bottom:6px;color:var(--paper-soft)}
+.vote-question select{padding:9px 10px;border-width:2px}
+.vote-question select:disabled{opacity:.6}
+.vote-card button:disabled{opacity:.55;cursor:default}
+.vote-card .btn{width:100%}
+.vote-card .btn.ghosty{width:auto}
+.vote-confirm{border-top:2px dashed #C9B9A8;margin-top:18px;padding-top:16px}
+.vote-confirm h3{font:23px var(--kr);margin:0 0 10px}
+.vote-review{list-style:none;padding:0;margin:0}
+.vote-review li{padding:8px 0;border-bottom:1px solid #DDCFBD;font-size:14px}
+.vote-review strong{display:block;font:21px var(--kr);margin-top:4px}
+.vote-done{padding:16px;border:2px dashed var(--line);border-radius:14px;background:#E6F1CF;margin:16px 0;font:19px/1.5 var(--kr);word-break:keep-all}
+.vote-winner{font:25px/1.4 var(--kr);margin:10px 0 14px;word-break:keep-all}
+.vote-ranking{list-style:none;padding:0;margin:0;font-size:14px}
+.vote-ranking li{display:grid;grid-template-columns:58px 1fr 30px;gap:8px;align-items:center;padding:4px 0}
+.vote-bar{height:9px;background:#fff8;border-radius:8px;overflow:hidden}
+.vote-bar span{display:block;height:100%;background:var(--grape);border-radius:8px}
+.vote-ranking b{text-align:right;font-weight:400}
+#vote-status{word-break:keep-all}
+@media(max-width:360px){.vote-card{padding:16px}.vote-question{padding:12px}.vote-question label,.vote-question h3{font-size:18px}}

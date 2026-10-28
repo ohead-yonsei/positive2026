@@ -31,6 +31,7 @@ window.GJ_BOARD_REQUEST=function(){
 window.GJ_BOARD_INITIAL=window.GJ_BOARD_REQUEST();
 </script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="vote.css?v=20261028-1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Permanent+Marker&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -396,10 +397,46 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
       <li><div><b>BBQ 파티</b><span>불 피우고 고기 굽기, 오늘의 메인</span></div></li>
       <li><div><b>다이소 이름 물품 발표회</b><span>한 명씩 세 글자 공개, 투표로 1등</span></div></li>
       <li><div><b>야식: 랜덤 떡볶이</b><span>부재료 하나씩 공개하면서 냄비에 투하</span></div></li>
-      <li><div><b>긍정 시상식</b><span>올해 가장 긍정적이었던 사람 외 부문별 시상</span></div></li>
+      <li><div><b>긍정 시상식</b><span>10년의 긍정을 축하해! 밤 9시 투표 결과 공개</span></div></li>
       <li><div><b>마니또 타임</b><span>무엇을 할지는 정해지면 안내할게</span></div></li>
       <li><div><b>다음날 아침</b><span>해장하고 다 같이 정리</span></div></li>
     </ol>
+  </section>
+
+  <section id="vote">
+    <div class="sh"><h2>10주년 긍정 투표</h2><span class="tag">Since 2017</span></div>
+    <p class="lede">함께한 10년을 떠올리며, 마음을 전하고 싶은 사람을 골라줘.</p>
+    <div class="sticker vote-card">
+      <div class="vote-top"><p class="vote-kicker">Positive Awards 🏆</p><span class="vote-total" id="vote-total">연결 중…</span></div>
+      <p class="vote-date" id="vote-date">10.31 토요일 밤 9시 공개</p>
+      <p class="vote-clock" id="vote-clock">한국 시간 기준 · 투표 마감과 함께 결과 공개</p>
+      <div id="vote-entry">
+        <p class="vote-note">본인 이름으로 한 번만! 질문마다 한 명씩 골라줘.<br>같은 사람을 여러 부문에서 골라도 돼. 제출 후에는 바꿀 수 없어.</p>
+        <label for="vote-name">투표하는 내 이름</label>
+        <select id="vote-name" disabled></select>
+        <p class="vote-done" id="vote-done" role="status" hidden></p>
+        <form id="vote-form">
+          <div id="vote-fields">
+            <div class="vote-question"><label for="vote-choice-0"><small>01 · 긍정왕</small>10년 동안 가장 긍정적이었던 사람은?</label><select id="vote-choice-0" required disabled></select></div>
+            <div class="vote-question"><label for="vote-choice-1"><small>02 · 긍정 지킴이</small>10년 동안 긍정모임을 가장 아껴준 사람은?</label><select id="vote-choice-1" required disabled></select></div>
+            <div class="vote-question"><label for="vote-choice-2"><small>03 · 내일의 긍정왕</small>앞으로의 긍정이 더 기대되는 사람은?</label><select id="vote-choice-2" required disabled></select></div>
+            <button class="btn" id="vote-review" type="submit" disabled>선택 내용 확인</button>
+          </div>
+          <div class="vote-confirm" id="vote-confirm" hidden>
+            <h3 id="vote-review-name" tabindex="-1"></h3>
+            <ul class="vote-review" id="vote-review-list"></ul>
+            <p class="vote-note">제출하면 수정할 수 없어. 내 이름과 선택을 한 번 더 확인해줘.</p>
+            <button class="btn" id="vote-send" type="button" disabled>이대로 투표하기</button>
+            <button class="btn ghosty" id="vote-edit" type="button">다시 고르기</button>
+          </div>
+        </form>
+      </div>
+      <div id="vote-results" hidden></div>
+      <p class="msg" id="vote-status" role="status">투표함을 불러오는 중이야…</p>
+      <button class="btn ghosty" id="vote-retry" type="button">현황 새로고침</button>
+      <p class="vote-note">공개 전에는 득표수와 순위를 볼 수 없어.<br>공개 후에도 누가 누구를 뽑았는지는 표시하지 않아.</p>
+      <noscript><p>투표하려면 브라우저의 자바스크립트를 켜줘.</p></noscript>
+    </div>
   </section>
 
   <section id="manito">
@@ -480,7 +517,6 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     <div class="sh"><h2>커밍 순</h2><span class="tag">Coming soon</span></div>
     <p class="lede">이게 다가 아니야. 하나씩 열릴 예정.</p>
     <div class="soon-grid">
-      <div class="sticker soon"><div class="blur" aria-hidden="true"><div class="soon-ico">🏆</div><h3>긍정 시상식 투표</h3><p>올해의 긍정왕부터 망언상까지, 부문별로 미리 투표</p></div><div class="stamp"><span>Coming soon</span></div></div>
       <div class="sticker soon"><div class="blur" aria-hidden="true"><div class="soon-ico">📸</div><h3>Since 2017 추억 사진관</h3><p>우리 모임 사진을 연도별로 모아보는 앨범</p></div><div class="stamp"><span>Coming soon</span></div></div>
       <div class="sticker soon"><div class="blur" aria-hidden="true"><div class="soon-ico">🎁</div><h3>비밀 이벤트</h3><p>당일 밤에 공개되는 깜짝 이벤트</p></div><div class="stamp"><span>???</span></div></div>
     </div>
@@ -916,5 +952,6 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 })();
 </script>
 <script src="raffle.js?v=20261023-2"></script>
+<script src="vote.js?v=20261028-1"></script>
 </body>
 </html>
