@@ -25,9 +25,10 @@ function client(api){
    const j=api.call(q);if(loseResponse&&q.op==='voteSubmit'){loseResponse=false;throw Error('lost response')}return{ok:true,json:async()=>j};
   }
  });
+ const auth=require('./client-auth-stub.cjs')(context);
  vm.runInContext(fs.readFileSync('vote.js','utf8'),context);
  const flush=()=>new Promise(r=>setImmediate(r));
- return{elements,flush,choose:async i=>{elements['vote-name'].value=String(i);await elements['vote-name'].fire('change')},
+ return{elements,flush,choose:async i=>{await auth.login(i)},
   review:async choices=>{for(let k=0;k<3;k++){elements['vote-choice-'+k].value=String(choices[k]);await elements['vote-choice-'+k].fire('change')}await elements['vote-form'].fire('submit')},
   submit:()=>elements['vote-send'].fire('click'),retry:async()=>{await elements['vote-retry'].fire('click');await flush()},
   offline:v=>offline=v,loseNext:()=>loseResponse=true,tick:async ms=>{perf+=ms;intervals.find(i=>i.ms===1000).fn();await flush()}};

@@ -27,17 +27,18 @@ function client(api,{local=new Map(),tab=new Map(),blocked=false}={}){
   setTimeout:(fn,ms)=>{timers.set(++timerId,{fn,ms});return timerId},clearTimeout:id=>timers.delete(id),setInterval:()=>{},
   fetch:async(url,options)=>{const q=options.method==='POST'?JSON.parse(options.body):Object.fromEntries(new URL(url).searchParams);const result=api.call(q);if(failAfterCommit&&q.op==='progress'){failAfterCommit=false;throw Error('lost response')}return {ok:true,json:async()=>result}}
  });
+ const auth=require('./client-auth-stub.cjs')(context);
  vm.runInContext(fs.readFileSync('raffle.js','utf8'),context);
  const flush=()=>new Promise(r=>setImmediate(r));
  return {elements,local,tab,flush,
-  join:async i=>{elements['rf-name'].value=String(i);elements['rf-enroll'].fire('click');await flush()},
+  join:async i=>{await auth.login(i);await flush()},
   clicks:n=>{for(let i=0;i<n;i++)document.fire('gj-boo')},
   save:async()=>{elements['rf-sync'].fire('click');await flush()},
   reload:async()=>{elements['rf-retry'].fire('click');await flush()},
   failNext:()=>failAfterCommit=true,
   text:id=>elements[id].textContent};
 }
-test('browser A and a fresh Kakao-like browser continue the same name without passwords',async()=>{
+test('browser A and a fresh Kakao-like browser continue the same member after site login',async()=>{
  const api=server(),a=client(api);await a.flush();await a.join(0);a.clicks(41);await a.flush();await a.save();
  assert.equal(api.call({op:'mine',i:0}).mine.count,41);
  const b=client(api);await b.flush();await b.join(0);assert.equal(b.text('rf-count'),'41번');
@@ -53,13 +54,13 @@ test('a lost response, retry, and page reload never add the same clicks again',a
  const api=server(),a=client(api);await a.flush();await a.join(0);a.clicks(10);a.failNext();await a.save();
  assert.equal(api.call({op:'mine',i:0}).mine.count,10);
  await a.save();assert.equal(api.call({op:'mine',i:0}).mine.count,10);
- const reload=client(api,{local:a.local,tab:a.tab});await reload.flush();assert.equal(reload.text('rf-count'),'10번');
+ const reload=client(api,{local:a.local,tab:a.tab});await reload.flush();await reload.join(0);assert.equal(reload.text('rf-count'),'10번');
  reload.clicks(5);await reload.save();assert.equal(api.call({op:'mine',i:0}).mine.count,15);
 });
 test('legacy counts survive once, and switching names does not copy past clicks',async()=>{
  const api=server();api.data.set('ghost_raffle_2026_0',JSON.stringify({i:0,count:100,tickets:1,tokenHash:'old'}));
  const local=new Map([['gj26-boo','130'],['gj26-raffle-v3',JSON.stringify({i:0,token:'old'})]]);
- const a=client(api,{local});await a.flush();assert.equal(a.text('rf-count'),'130번');
+ const a=client(api,{local});await a.flush();await a.join(0);assert.equal(a.text('rf-count'),'130번');
  a.clicks(5);await a.save();assert.equal(api.call({op:'mine',i:0}).mine.count,135);
  await a.join(1);assert.equal(a.text('rf-count'),'0번');a.clicks(2);await a.save();
  assert.equal(api.call({op:'mine',i:0}).mine.count,135);assert.equal(api.call({op:'mine',i:1}).mine.count,2);
