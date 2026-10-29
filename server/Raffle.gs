@@ -1,5 +1,5 @@
 /** 긍정의밤 유령 추첨. Code.gs의 handle() 잠금 안에서 호출한다.
- * 이름만으로 참여하고, 선물은 운영진이 현장에서 전달한다.
+ * 사이트 로그인으로 참여하고, 선물은 운영진이 현장에서 전달한다.
  * 비밀번호와 기프티콘 이미지는 이 파일에 넣지 않는다.
  */
 const RAFFLE_CLOSE = Date.parse('2026-10-31T00:00:00+09:00');
@@ -54,9 +54,11 @@ function raffleRandom_(total) {
   return n % total;
 }
 function raffleAction(q) {
-  // Reuse the existing locked event route without touching private Code.gs.
+  // Code.gs route() checks authGuard_ before reaching this locked route.
+  if (typeof q.op === 'string' && q.op.indexOf('auth') === 0) return authAction(q);
   if (['voteStatus','voteSubmit','voteReveal'].indexOf(q.op) >= 0) return voteAction(q);
   if (typeof q.op === 'string' && q.op.indexOf('quiz') === 0) return quizAction(q);
+  if (typeof q.op === 'string' && q.op.indexOf('third') === 0) return thirdAction(q);
   const p = PropertiesService.getScriptProperties();
   if (q.op === 'status') return rafflePublic_();
   if (q.op === 'claim') return {ok:false, err:'raffle_only'};
