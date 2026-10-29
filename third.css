@@ -1,0 +1,23 @@
+#third [hidden],#third-admin [hidden]{display:none!important}
+.third-card{padding:22px;color:var(--paper-ink)}
+.third-card h4{font:22px var(--kr);margin:20px 0 10px}
+.third-card textarea{box-sizing:border-box;width:100%;resize:vertical;font:16px/1.6 var(--body);color:var(--paper-ink);background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px;min-height:110px}
+.third-card .btn{width:100%;margin-top:10px}
+.third-card .btn.ghosty{width:auto}
+.third-card button:disabled,#third-admin button:disabled{opacity:.5;cursor:default}
+.third-rules{background:#FFF1C4;border:2px solid var(--line);border-radius:12px;padding:12px;margin:12px 0 20px;font-size:14px}
+.third-rules summary{font:18px var(--kr);cursor:pointer}
+.third-rules ol{padding-left:22px;margin:12px 0}.third-rules li{margin:7px 0}
+.third-rules p{margin:8px 0 0}
+#third-entry label{margin-top:18px}
+.third-pick{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:center;margin:12px 0}
+.third-pick label{margin:0;font:18px var(--kr)}
+.third-pick select{margin:0;min-width:0}
+.third-reveal{border:3px solid var(--line);border-radius:14px;background:#EADFF5;padding:16px;margin-top:20px;word-break:keep-all}
+.third-reveal.success{background:#E6F1CF}.third-reveal h4{margin:0 0 10px}.third-reveal p{margin:6px 0}
+.third-history{padding-left:23px;font-size:14px}.third-history li{margin:12px 0;overflow-wrap:anywhere}
+#third-winners{font:22px/1.5 var(--kr)}
+#third-review summary{font:18px var(--kr);cursor:pointer;padding:12px 0}
+#third-admin-list li.excluded{background:#eee;opacity:.75}
+#third-title{overflow-wrap:anywhere}
+@media(max-width:360px){.third-card{padding:16px}.third-pick{grid-template-columns:56px 1fr;gap:7px}}

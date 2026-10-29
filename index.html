@@ -33,6 +33,8 @@ window.GJ_BOARD_INITIAL=window.GJ_BOARD_REQUEST();
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="vote.css?v=20261028-2">
 <link rel="stylesheet" href="quiz.css?v=20261028-1">
+<link rel="stylesheet" href="third.css?v=20261029-1">
+<link rel="stylesheet" href="auth.css?v=20261029-1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Permanent+Marker&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -344,7 +346,39 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
   </div>
 </header>
 
+<nav class="account-nav" aria-label="내 계정"><button type="button" id="auth-jump">로그인 · 내 참여</button></nav>
 <main class="wrap">
+  <section id="account">
+    <div class="sh"><h2>내 참여</h2><span class="tag">Hello, positive!</span></div>
+    <div class="sticker auth-card">
+      <h3 id="auth-heading" tabindex="-1">내 이름으로 참여하기</h3>
+      <form id="auth-login-form">
+        <p>처음에는 <b>기존 마니또 비밀번호</b>로 로그인해줘.<br>로그인하면 질문·투표·도착 시간을 내 이름으로 이어갈 수 있어.</p>
+        <label for="auth-name">이름</label><select id="auth-name" autocomplete="username" required></select>
+        <label for="auth-password">사이트 비밀번호</label><input id="auth-password" type="password" autocomplete="current-password" minlength="4" maxlength="128" required>
+        <label class="auth-check"><input id="auth-remember" type="checkbox" checked>이 브라우저에서 로그인 유지</label>
+        <button class="btn" id="auth-login" type="submit">로그인</button>
+        <button class="auth-link" id="auth-forgot" type="button">비밀번호를 잊었어</button>
+        <p class="auth-note">카톡에서 로그인이 풀려도 다시 로그인하면 기록이 이어져. 행사 안내는 로그인 없이 볼 수 있어.</p>
+      </form>
+      <div id="auth-member" hidden>
+        <p>아래에서 내 기록을 확인하고 바로 참여해봐!</p>
+        <div class="auth-summary" id="auth-summary"></div>
+        <button class="btn ghosty" id="auth-logout" type="button">로그아웃</button>
+      </div>
+      <details id="auth-change" hidden>
+        <summary id="auth-change-title">사이트 비밀번호 변경</summary>
+        <p class="auth-note" id="auth-change-note"></p>
+        <form id="auth-change-form">
+          <label for="auth-current">현재 사이트 비밀번호 (또는 임시 비밀번호)</label><input id="auth-current" type="password" autocomplete="current-password" minlength="4" maxlength="128" required>
+          <label for="auth-new">새 사이트 비밀번호</label><input id="auth-new" type="password" autocomplete="new-password" minlength="4" maxlength="128" required>
+          <label for="auth-new-confirm">새 비밀번호 한 번 더</label><input id="auth-new-confirm" type="password" autocomplete="new-password" minlength="4" maxlength="128" required>
+          <button class="btn" id="auth-change-save" type="submit">사이트 비밀번호 저장</button>
+        </form>
+      </details>
+      <p class="msg" id="auth-status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
   <section id="bring">
     <div class="sh"><h2>가져올 것</h2><span class="tag">Bring it!</span></div>
     <p class="lede">준비물은 <b>떡볶이 재료 1개</b>와 <b>마니또 이름으로 고른 다이소 물건 3개</b>! 뭘 가져오는지는 당일까지 비밀. 아래 안내를 읽고 카드 아래 내 이름을 눌러서 확인 체크! “못 봤다” 금지 👻</p>
@@ -359,6 +393,7 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     <div class="sh"><h2>할 일</h2><span class="tag">To-do</span></div>
     <p class="lede" id="todo-lede">하고 싶은 일에 내 이름을 넣어줘. 할 일을 추가하거나 카드 색도 고를 수 있어. 바꾸면 자동으로 저장돼.</p>
 
+    <p class="auth-locked-note" id="board-login-note"><a href="#account">로그인</a>하면 내 이름으로 할 일을 맡을 수 있어.</p>
     <div class="pool-wrap" id="pool-wrap" hidden>
       <p class="pool-help" id="pool-help">이름을 할 일 카드로 끌어다 놓거나, 이름을 누른 다음 카드를 눌러줘. 한 사람이 여러 일을 맡아도 돼.</p>
       <div class="pool" id="pool"></div>
@@ -382,8 +417,9 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
 
   <section id="arrival">
     <div class="sh"><h2>도착 예정 시간</h2><span class="tag">See you!</span></div>
-    <p class="lede">내 이름을 고르고 도착할 시간대를 눌러줘. 이름을 끌어다 놓아도 돼!</p>
+    <p class="lede">로그인하고 도착할 시간대를 눌러줘. 내 이름이 자동으로 들어가!</p>
     <div class="load-status" id="arrival-load" role="status"><span class="load-spinner" aria-hidden="true"></span><span class="load-note">도착 시간을 불러오는 중이야…</span><button type="button" class="load-retry" hidden>다시 연결</button></div>
+    <p class="auth-locked-note" id="arrival-login-note"><a href="#account">로그인</a>하면 도착 시간을 정할 수 있어.</p>
     <div class="arrival-pool" id="arrival-pool" aria-label="도착 시간을 정할 이름" hidden></div>
     <p id="arrival-help">도착 시간을 불러오는 중…</p>
     <div class="arrival-grid" id="arrival-grid" aria-label="도착 예정 시간별 명단" aria-busy="true"></div>
@@ -466,14 +502,68 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     </div>
   </section>
 
+  <section id="third">
+    <div class="sh"><h2>내가 딱 3등! 🥉</h2><span class="tag">Third place!</span></div>
+    <p class="lede">우리 중 <b>본인이 3등 할 것 같은 질문</b>을 하나 만들어줘! 1등도 2등도 말고, 딱 3등을 노려봐.</p>
+    <div class="sticker third-card">
+      <div class="quiz-top"><span class="quiz-pill" id="third-phase">질문 모집 중</span><span class="quiz-note" id="third-count"></span></div>
+      <h3 id="third-title" class="quiz-title">본인이 3등 할 질문은?</h3>
+      <details class="third-rules"><summary>어떻게 하는 게임이야?</summary>
+        <ol><li>본인이 3등 할 것 같은 질문을 하나 제출해.</li><li>운영진이 시작하면 질문이 무작위 순서로 나와.</li><li>질문에 어울리는 사람을 1·2·3순위로 골라. 각각 3·2·1점!</li><li>순위 공개 후 작성자 공개! 본인이 쓴 질문에서 본인이 3등이면 성공이야.</li></ol>
+        <p>작성자는 자기 질문에 투표하지 않아. 다른 참가자는 본인에게도 투표할 수 있어. 3등이 걸린 동점은 추가 투표하고, 그래도 동점이면 공동 3등으로 인정해.</p>
+      </details>
+      <div id="third-identity"><label for="third-name">참여할 내 이름</label><select id="third-name" disabled></select><p class="quiz-note">로그인한 이름으로 참여해. 다른 브라우저에서도 로그인하면 이어갈 수 있어.</p></div>
+      <form id="third-entry" hidden>
+        <label for="third-prompt">본인이 3등 할 것 같은 질문</label>
+        <textarea id="third-prompt" rows="3" minlength="5" maxlength="180" placeholder="예: 무인도에 떨어져도 은근히 잘 살 것 같은 사람은?"></textarea>
+        <p class="quiz-note">1등 할 것 같은 질문이 아니라, <b>본인이 3등 할 것 같은 질문!</b> 이름을 직접 쓰지 말고, 누구에게 표가 갈지 고민되는 질문으로 만들어봐.</p>
+        <button class="btn" id="third-save" type="submit" disabled>질문 저장</button>
+        <p class="quiz-note" id="third-saved">한 사람당 하나. 운영진이 시작하기 전까지 수정할 수 있어.</p>
+      </form>
+      <div id="third-ballot" hidden><p class="quiz-note" id="third-vote-help"></p><div id="third-picks"></div><button class="btn" id="third-vote" type="button" disabled>선택한 순서로 투표</button></div>
+      <div id="third-results" hidden><h4>친구들이 뽑은 순위</h4><ol id="third-ranking" class="quiz-ranking"></ol></div>
+      <div id="third-reveal" class="third-reveal" hidden></div>
+      <div id="third-finish" hidden><h4>오늘의 3등 예측 성공자 🥉</h4><p id="third-winners"></p><ol id="third-history" class="third-history"></ol></div>
+      <p class="msg" id="third-status" role="status">질문함을 불러오는 중이야…</p><button class="btn ghosty" id="third-retry" type="button">다시 연결</button>
+    </div>
+  </section>
+
   <section id="event-admin" hidden>
     <div class="sh"><h2>운영진 진행실</h2><span class="tag">Admin</span></div>
     <div class="sticker event-admin-card">
       <div id="qa-login"><label for="qa-pw">운영진 비밀번호</label><input id="qa-pw" type="password" autocomplete="off"><button class="btn" id="qa-auth" type="button">운영진 연결</button></div>
-      <p class="msg" id="qa-status" role="status">운영진 비밀번호로 퀴즈와 투표 공개를 진행해줘.</p>
+      <p class="msg" id="qa-status" role="status">운영진 비밀번호로 퀴즈·3등 게임·투표 공개를 진행해줘.</p>
       <div id="qa-body" hidden>
+        <div id="auth-admin" hidden>
+          <h3>사이트 로그인 비밀번호 초기화</h3>
+          <p class="quiz-note">사이트 비밀번호만 바뀌어. 마니또 등록·매칭과 질문·투표 기록은 유지돼. 기존 사이트 로그인은 모두 해제돼.</p>
+          <form id="auth-admin-reset-form">
+            <label for="auth-admin-who">초기화할 사람</label><select id="auth-admin-who"></select>
+            <p class="quiz-note" id="auth-admin-info"></p>
+            <label for="auth-admin-temp">전달할 임시 사이트 비밀번호 (4자 이상)</label><input id="auth-admin-temp" type="password" autocomplete="new-password" minlength="4" maxlength="128" required>
+            <label class="auth-check"><input id="auth-admin-confirm" type="checkbox" required>선택한 사람의 사이트 비밀번호만 초기화할게</label>
+            <button class="btn" id="auth-admin-reset" type="submit" disabled>사이트 비밀번호만 초기화</button>
+            <button class="btn ghosty" id="auth-admin-refresh" type="button">계정 현황 다시 확인</button>
+          </form>
+          <p class="quiz-note">임시 비밀번호를 본인에게 따로 알려줘. 로그인 후 새 비밀번호를 정하게 돼.</p>
+          <p class="msg" id="auth-admin-status" role="status"></p>
+        </div>
         <button class="btn ghosty" id="qa-refresh" type="button">진행 상황 새로고침</button>
         <button class="btn ghosty" id="qa-logout" type="button">운영진 연결 해제</button>
+        <div class="quiz-admin-section" id="third-admin">
+          <h3>내가 딱 3등! 진행</h3><p id="third-admin-summary" class="quiz-admin-summary">운영진 연결을 기다리는 중…</p>
+          <p class="quiz-note">질문을 확인하고 시작하면 무작위 순서가 확정돼. 작성자는 순위 다음에 별도로 공개해.</p>
+          <button class="btn ghosty" id="third-admin-refresh" type="button">질문·진행 새로고침</button>
+          <details id="third-review"><summary>제출된 질문 검토</summary><p class="quiz-note">작성자 이름은 이 목록에 표시하지 않아. 진행하지 않을 질문은 제외할 수 있어.</p><ul id="third-admin-list" class="quiz-edit-list"></ul></details>
+          <button class="btn" id="third-start" type="button" disabled>질문 마감 · 무작위 시작</button>
+          <button class="btn" id="third-close" type="button" hidden>투표 마감 · 순위 확인</button>
+          <button class="btn" id="third-author" type="button" hidden>작성자 · 성공 여부 공개</button>
+          <button class="btn" id="third-next" type="button" hidden>다음 질문</button>
+          <button class="btn" id="third-end" type="button" hidden>최종 결과 공개</button>
+          <button class="btn ghosty" id="third-prepare" type="button" hidden>질문 다시 모으기</button>
+          <div id="third-confirm" class="quiz-admin-confirm" hidden><p id="third-confirm-text"></p><button class="btn" id="third-confirm-go" type="button">진행하기</button><button class="btn ghosty" id="third-confirm-cancel" type="button">취소</button></div>
+          <p class="msg" id="third-admin-status" role="status"></p>
+        </div>
         <div class="quiz-admin-section">
           <h3>투표 결과 공개</h3><p class="quiz-note" id="qa-vote-state">투표 현황을 확인하는 중…</p>
           <button class="btn" id="qa-vote-open" type="button">투표 마감 · 결과 미리 공개</button>
@@ -518,7 +608,7 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
       <span class="bubble" id="b2" hidden>Boo!</span>
       <button class="ghost" data-bubble="b2" aria-label="유령 누르기"><svg><use href="#ghost"/></svg></button>
       <h3 class="mh">내 마니또</h3>
-      <p class="how">처음엔 이름을 고르고 비밀번호를 정해서 <b>등록</b>해줘. 11명이 다 등록하면 운영진이 매칭을 시작하고, 그다음부터 같은 이름과 비밀번호로 확인할 수 있어. 결과는 각자 비밀번호로 잠겨서 운영진도 못 봐.</p>
+      <p class="how">사이트에 로그인한 뒤 <b>기존 마니또 비밀번호</b>를 입력해줘. 사이트 비밀번호를 바꿨어도 마니또 비밀번호는 그대로야. 결과는 각자 마니또 비밀번호로 잠겨 있어.</p>
       <ul class="regchips" id="mn-chips"></ul>
       <p class="progress" id="mn-progress"></p>
       <div id="mn-form">
@@ -550,9 +640,9 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
       <input id="ad-pw" type="password" autocomplete="off">
       <button class="btn" id="ad-start" disabled>매칭 시작</button>
       <p class="msg" id="ad-msg" aria-live="polite"></p>
-      <label for="ad-who">비밀번호를 잊은 사람 초기화</label>
-      <div class="addrow"><select id="ad-who"></select><button class="btn ghosty" id="ad-reset">초기화</button></div>
-      <p class="note">초기화하면 그 사람은 다시 등록해야 하고, 매칭도 처음부터 다시 시작해야 해.</p>
+      <label for="ad-who">마니또 등록 초기화 · 매칭 재진행 필요</label>
+      <div class="addrow"><select id="ad-who"></select><button class="btn ghosty" id="ad-reset">마니또 초기화</button></div>
+      <p class="note">마니또 초기화는 그 사람의 등록과 기존 매칭을 지워. 사이트 로그인 비밀번호를 잊은 경우에는 위 운영진 진행실의 ‘사이트 비밀번호만 초기화’를 사용해줘.</p>
     </div>
   </section>
   <section id="raffle">
@@ -562,14 +652,14 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
       <h3>100번마다 추첨권 한 장 👻</h3>
       <p class="raffle-rules">1인 최대 5장 · 선물은 딱 한 명에게!<br>10월 30일 밤 11시 59분 59초까지 응모하고<br>31일에 응모권 비율대로 룰렛 추첨해. (한국시간)</p>
       <p id="rf-clock" class="raffle-clock"></p>
-      <div class="raffle-meter"><div><strong id="rf-count">0번</strong><span id="rf-count-label">이름을 고르면 횟수가 이어져</span></div><div><strong id="rf-tickets">0 / 5장</strong><span>서버에 저장된 내 응모권</span></div></div>
+      <div class="raffle-meter"><div><strong id="rf-count">0번</strong><span id="rf-count-label">로그인하면 내 횟수가 이어져</span></div><div><strong id="rf-tickets">0 / 5장</strong><span>서버에 저장된 내 응모권</span></div></div>
       <label for="rf-name">참여할 내 이름</label>
       <select id="rf-name"></select>
-      <button class="btn" id="rf-enroll" disabled>이 이름으로 이어가기</button>
+      <button class="btn" id="rf-enroll" disabled>내 횟수 불러오기</button>
       <button class="btn" id="rf-sync" hidden>내 횟수 저장 확인</button>
       <p id="rf-status" class="raffle-status" role="status">추첨 이벤트를 불러오는 중…</p>
       <button class="btn ghosty" id="rf-retry">현황 새로고침</button>
-      <p class="note">비밀번호 없이 내 이름만 고르면 돼!<br>카톡·사파리·크롬 어디서든 저장된 횟수가 이어져.<br>100번마다 자동 응모 · 선물은 당첨자에게 당일 직접 전달해.</p>
+      <p class="note">사이트에 로그인하면 바로 참여할 수 있어!<br>카톡·사파리·크롬 어디서든 저장된 횟수가 이어져.<br>100번마다 자동 응모 · 선물은 당첨자에게 당일 직접 전달해.</p>
       <div class="raffle-wheel"><canvas id="rf-wheel" width="600" height="600" role="img" aria-label="응모권 수에 비례한 룰렛. 아래에서 이름별 응모권과 확률을 확인할 수 있어."></canvas></div>
       <p id="rf-total">참여 현황을 불러오는 중…</p>
       <ul class="raffle-entries" id="rf-entries" aria-label="이름별 응모권과 당첨 확률"></ul>
@@ -606,13 +696,14 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     <button class="gclose" id="g-close" aria-label="닫기">×</button>
     <h3 id="g-title">👻 100번 놀래킴 달성!</h3>
     <div id="g-ask">
-      <p>내 이름을 고르면 100번마다 자동으로 응모돼!<br>10월 31일 추첨하고 선물은 당일 직접 전달해.</p>
+      <p>로그인하면 100번마다 자동으로 응모돼!<br>10월 31일 추첨하고 선물은 당일 직접 전달해.</p>
       <button class="btn" id="g-enter">내 추첨권 받으러 가기</button>
     </div>
 
   </div>
 </div>
 
+<script src="auth.js?v=20261029-1"></script>
 <script>
 (function(){
 const NAMES=['구세라','권경지','권순록','김강일','류원선','박재훈','서정윤','유세종','이대호','이수한','천수진'];
@@ -655,15 +746,10 @@ const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},se
 const C=window.crypto&&crypto.subtle;
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
 
+const A=window.GJ_AUTH;
 /* ---------- server ---------- */
 async function api(params,post){
-  if(!API){const e=new Error('noapi');e.code='noapi';throw e}
-  let r;
-  if(post) r=await fetch(API,{method:'POST',body:JSON.stringify(params)});
-  else r=await fetch(API+'?'+new URLSearchParams({...params,t:Date.now()}).toString(),{cache:'no-store'});
-  const j=await r.json();
-  if(!j.ok){const e=new Error(j.err);e.code=j.err;e.data=j;throw e}
-  return j;
+  return A.request(params,{required:['board','register','mine'].includes(params.a)});
 }
 
 let S={board:{tasks:[]},registered:[],started:false};
@@ -684,11 +770,13 @@ const taskColor=t=>TASK_COLORS.some(([key])=>key===t.color)?t.color:t.id==='staf
 function setSync(t,cls){['sync','arrival-sync'].forEach(id=>{const s=$(id);s.textContent=t;s.className='sync'+(cls?' '+cls:'')})}
 
 function renderBoard(){
-  const live=!!API&&loaded;
+  const live=!!API&&loaded&&A.identity()!==null;
+  selected=live?A.identity():null;
+  $('board-login-note').hidden=A.identity()!==null;
   $('pool-wrap').hidden=!live;$('addtask').hidden=!live;
   const pool=$('pool');pool.innerHTML='';
-  NAMES.forEach((n,i)=>{const b=el('button','pchip'+(selected===i?' sel':''),n);b.type='button';b.dataset.i=i;pool.appendChild(b)});
-  $('pool-help').textContent=selected===null?'내 이름을 할 일 카드로 끌어다 놓거나, 이름을 누른 다음 카드를 눌러줘. 자동으로 저장돼.':NAMES[selected]+' 선택됨. 넣을 카드를 눌러줘.';
+  NAMES.forEach((n,i)=>{if(i!==A.identity())return;const b=el('button','pchip'+(selected===i?' sel':''),n);b.type='button';b.dataset.i=i;pool.appendChild(b)});
+  $('pool-help').textContent=selected===null?'내 이름을 할 일 카드로 끌어다 놓거나, 이름을 누른 다음 카드를 눌러줘. 자동으로 저장돼.':NAMES[selected]+' · 맡고 싶은 카드를 누르면 내 이름이 들어가.';
   const board=$('board'), focused=document.activeElement?.closest('[data-task-color],[data-color-toggle]');
   const restore=focused?{tid:focused.closest('.task').dataset.id,color:focused.dataset.taskColor}:null;
   board.innerHTML='';
@@ -701,10 +789,10 @@ function renderBoard(){
       const toggle=el('button','task-color-toggle','색');toggle.type='button';toggle.dataset.colorToggle=t.id;
       toggle.setAttribute('aria-label',t.title+' 카드 색 고르기');toggle.setAttribute('aria-expanded',String(colorOpen===t.id));toggle.setAttribute('aria-controls','task-colors-'+t.id);head.appendChild(toggle);
     }
-    if(live&&t.id!=='staff'){const d=el('button','tdel'+(armed===t.id?' arm':''),armed===t.id?'정말 삭제?':'삭제');d.type='button';d.dataset.del=t.id;head.appendChild(d)}
+    if(live&&t.id!=='staff'&&!t.people.some(i=>i!==A.identity())){const d=el('button','tdel'+(armed===t.id?' arm':''),armed===t.id?'정말 삭제?':'삭제');d.type='button';d.dataset.del=t.id;head.appendChild(d)}
     const ul=el('ul','people');
     if(!t.people.length) ul.appendChild(el('li','empty',live?'이름을 여기로':'아직 비어 있어'));
-    t.people.forEach(i=>{const li=el('li',live?'':'only',NAMES[i]);if(live){const x=el('button',null,'×');x.type='button';x.dataset.rm=t.id+':'+i;x.setAttribute('aria-label',NAMES[i]+' 빼기');li.appendChild(x)}ul.appendChild(li)});
+    t.people.forEach(i=>{const li=el('li',live?'':'only',NAMES[i]);if(live&&i===A.identity()){const x=el('button',null,'×');x.type='button';x.dataset.rm=t.id+':'+i;x.setAttribute('aria-label',NAMES[i]+' 빼기');li.appendChild(x)}ul.appendChild(li)});
     card.append(head,ul);
     if(live){
       const colors=el('div','task-colors');colors.setAttribute('role','group');colors.setAttribute('aria-label',t.title+' 배경색');
@@ -738,15 +826,17 @@ function applyLocal(op){
   else if(op.type==='delTask') b.tasks=b.tasks.filter(x=>x.id!==op.tid);
 }
 function send(op){
+  if(A.identity()===null){A.open();return}
+  const owner=A.identity();
   applyLocal(op);renderBoard();renderAcks();renderArrivals();
   pending++;setSync('저장 중…');
   queue=queue.then(async()=>{
-    try{const j=await api({a:'board',op},true);pending--;if(!pending){S.board=j.board;S.registered=j.registered;S.started=j.started;cacheBoard();renderAll();setSync('저장됨 ✓','ok')}}
-    catch(e){pending--;setSync('저장하지 못했어. 새로고침 후 다시 해줘','bad');refresh()}
+    try{if(A.identity()!==owner)throw Error('auth_changed');const j=await api({a:'board',op},true);pending--;if(!pending){S.board=j.board;S.registered=j.registered;S.started=j.started;cacheBoard();renderAll();setSync('저장됨 ✓','ok')}}
+    catch(e){pending--;setSync(A.errorText(e),'bad');refresh()}
   });
 }
 $('board').addEventListener('click',e=>{
-  if(!API||!loaded) return;
+  if(!API||!loaded||A.identity()===null) return;
   const toggle=e.target.closest('[data-color-toggle]');
   if(toggle){colorOpen=colorOpen===toggle.dataset.colorToggle?null:toggle.dataset.colorToggle;renderBoard();return}
   const color=e.target.closest('[data-task-color]');
@@ -771,7 +861,7 @@ $('board').addEventListener('click',e=>{
 $('board').addEventListener('keydown',e=>{if(e.key==='Escape'&&colorOpen!==null){e.preventDefault();colorOpen=null;renderBoard()}});
 let drag=null;
 function startDrag(e,scope){
-  if(!API||!loaded)return;
+  if(!API||!loaded||A.identity()===null)return;
   const c=e.target.closest('.pchip');if(!c)return;
   drag={scope,i:+c.dataset.i,x:e.clientX,y:e.clientY,on:false,fl:null,over:null};
 }
@@ -803,7 +893,7 @@ function endDrag(e,cancel){
 document.addEventListener('pointerup',e=>endDrag(e,false));
 document.addEventListener('pointercancel',e=>endDrag(e,true));
 function addTask(){
-  const v=$('t-new').value.trim();if(!v||!API||!loaded)return;
+  const v=$('t-new').value.trim();if(!v||!API||!loaded||A.identity()===null)return;
   $('t-new').value='';
   send({type:'addTask',id:'t'+Date.now().toString(36)+Math.floor(Math.random()*1e4),title:v.slice(0,40)});
 }
@@ -812,15 +902,18 @@ $('t-new').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.
 
 /* ---------- 도착 예정 시간 ---------- */
 function renderArrivals(){
-  const live=!!API&&loaded, values=Array.isArray(S.board.arrivals)?S.board.arrivals:[];
-  const available=NAMES.map((_,i)=>i).filter(i=>!ARRIVAL_HOURS.includes(values[i]));
-  if(arrivalSelected!==null&&!available.includes(arrivalSelected))arrivalSelected=null;
+  const live=!!API&&loaded&&A.identity()!==null, values=Array.isArray(S.board.arrivals)?S.board.arrivals:[];
+  const available=NAMES.map((_,i)=>i).filter(i=>i===A.identity()&&!ARRIVAL_HOURS.includes(values[i]));
+  arrivalSelected=live?A.identity():null;
+  $('arrival-login-note').hidden=A.identity()!==null;
+  if(A.identity()!==null)A.summary('arrival',values[A.identity()]?arrivalLabel(values[A.identity()])+' 도착 예정':'도착 시간 정하기',A.identity());
+
   const active=document.activeElement, poolFocus=active?.closest('#arrival-pool .pchip'), slotFocus=active?.closest('.arrival-slot');
   const restoreName=poolFocus?.dataset.i,restoreHour=slotFocus?.dataset.hour;
   const pool=$('arrival-pool');pool.hidden=!live||!available.length;pool.replaceChildren();
   $('arrival-help').hidden=!live;
   available.forEach(i=>{const b=el('button','pchip'+(arrivalSelected===i?' sel':''),NAMES[i]);b.type='button';b.dataset.i=i;b.setAttribute('aria-pressed',String(arrivalSelected===i));pool.appendChild(b)});
-  $('arrival-help').textContent=!live?(API?'도착 시간을 불러오는 중…':'서버가 연결되면 도착 시간을 정할 수 있어.'):!available.length?'모두 도착 시간을 정했어! 바꾸려면 이름 옆 ×로 빼고 다시 골라줘.':arrivalSelected===null?'시간을 정한 이름은 위 목록에서 사라져. 시간 변경은 ×로 빼고 다시 골라줘.':NAMES[arrivalSelected]+' 선택됨. 도착할 시간대를 눌러줘.';
+  $('arrival-help').textContent=!live?(API?'도착 시간을 불러오는 중…':'서버가 연결되면 도착 시간을 정할 수 있어.'):NAMES[A.identity()]+'의 도착할 시간대를 눌러줘. 다른 시간대를 누르면 바로 변경돼.';
   const grid=$('arrival-grid');grid.replaceChildren();
   ARRIVAL_HOURS.forEach(hour=>{
     const people=NAMES.map((_,i)=>i).filter(i=>values[i]===hour),label=arrivalLabel(hour);
@@ -829,7 +922,7 @@ function renderArrivals(){
     button.append(el('span',null,label),el('small',null,people.length+'명'));
     const ul=el('ul','arrival-names');ul.setAttribute('aria-label',label+' 도착 예정');
     if(!people.length)ul.appendChild(el('li','empty','아직 없어'));
-    people.forEach(i=>{const li=el('li',live?'':'only',NAMES[i]);if(live){const remove=el('button',null,'×');remove.type='button';remove.dataset.arrivalRemove=i;remove.setAttribute('aria-label',NAMES[i]+' '+label+' 도착 취소');li.appendChild(remove)}ul.appendChild(li)});
+    people.forEach(i=>{const li=el('li',live?'':'only',NAMES[i]);if(live&&i===A.identity()){const remove=el('button',null,'×');remove.type='button';remove.dataset.arrivalRemove=i;remove.setAttribute('aria-label',NAMES[i]+' '+label+' 도착 취소');li.appendChild(remove)}ul.appendChild(li)});
     slot.append(button,ul);grid.appendChild(slot);
   });
   if(restoreName!==undefined)Array.from(pool.children).find(b=>b.dataset.i===restoreName)?.focus({preventScroll:true});
@@ -841,7 +934,7 @@ $('arrival-pool').addEventListener('click',e=>{
   arrivalSelected=arrivalSelected===+b.dataset.i?null:+b.dataset.i;renderArrivals();
 });
 $('arrival-grid').addEventListener('click',e=>{
-  if(!API||!loaded)return;
+  if(!API||!loaded||A.identity()===null)return;
   const slot=e.target.closest('.arrival-slot');if(!slot)return;
   const hour=+slot.dataset.hour,remove=e.target.closest('[data-arrival-remove]');
   if(remove){send({type:'removeArrival',i:+remove.dataset.arrivalRemove,hour});return}
@@ -853,21 +946,21 @@ $('arrival-grid').addEventListener('click',e=>{
 const ACKS=[['ack-ttk','떡볶이 확인'],['ack-daiso','다이소 확인']];
 let acksEnsured=false;
 function ensureAcks(){
-  if(acksEnsured||!API||!loaded)return;acksEnsured=true;
+  if(acksEnsured||!API||!loaded||A.identity()===null)return;acksEnsured=true;
   ACKS.forEach(([id,title])=>{if(!S.board.tasks.some(t=>t.id===id))send({type:'addTask',id,title})});
 }
 function renderAcks(){
-  const live=!!API&&loaded;
+  const live=!!API&&loaded&&A.identity()!==null;
   document.querySelectorAll('.ack').forEach(box=>{
     box.hidden=!live;if(!live)return;
     const t=S.board.tasks.find(x=>x.id===box.dataset.ack), on=new Set(t?t.people:[]);
     const cnt=box.querySelector('.ack-cnt');cnt.textContent=on.size===N?'전원 확인 완료 🎉':`확인 ${on.size}/${N}`;cnt.className='ack-cnt'+(on.size===N?' done':'');
     const ul=box.querySelector('.ackchips');ul.innerHTML='';
-    NAMES.forEach((n,i)=>{const li=document.createElement('li');const b=el('button','ackchip'+(on.has(i)?' on':''),(on.has(i)?'✓ ':'')+n);b.type='button';b.dataset.i=i;b.setAttribute('aria-pressed',on.has(i));li.appendChild(b);ul.appendChild(li)});
+    NAMES.forEach((n,i)=>{const li=document.createElement('li');const b=el('button','ackchip'+(on.has(i)?' on':''),(on.has(i)?'✓ ':'')+n);b.type='button';b.disabled=i!==A.identity();b.dataset.i=i;b.setAttribute('aria-pressed',on.has(i));li.appendChild(b);ul.appendChild(li)});
   });
 }
 document.querySelector('.bring').addEventListener('click',e=>{
-  const b=e.target.closest('.ackchip');if(!b||!API||!loaded)return;
+  const b=e.target.closest('.ackchip');if(!b||!API||!loaded||A.identity()===null||+b.dataset.i!==A.identity())return;
   const tid=b.closest('.ack').dataset.ack, i=+b.dataset.i;
   const t=S.board.tasks.find(x=>x.id===tid);
   if(!t){send({type:'addTask',id:tid,title:'확인'});send({type:'add',tid,i});return}
@@ -890,19 +983,20 @@ async function pinKeys(pin,salt){
 /* ---------- manito UI ---------- */
 const sel=$('mn-name');
 sel.innerHTML='<option value="">이름 선택</option>'+NAMES.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
-const savedName=store.get('gj26-name');if(savedName!==null)sel.value=savedName;
+A.bindIdentity(sel);
 $('ad-who').innerHTML=NAMES.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
 
 function msg(id,t,cls){const m=$(id);m.textContent=t||'';m.className='msg'+(cls?' '+cls:'')}
 function renderManito(){
   const reg=new Set(S.registered);
   $('mn-chips').innerHTML=NAMES.map((n,i)=>`<li class="${reg.has(i)?'got':''}">${reg.has(i)?'✓ ':''}${n}</li>`).join('');
-  $('mn-progress').textContent=!loaded?'불러오는 중…':S.started?'매칭 완료! 이름과 비밀번호로 내 마니또를 확인해봐.':`${reg.size}/${N}명 등록${reg.size===N?'. 운영진이 매칭을 시작하면 확인할 수 있어.':''}`;
+  $('mn-progress').textContent=!loaded?'불러오는 중…':S.started?'매칭 완료! 기존 마니또 비밀번호로 확인해봐.':`${reg.size}/${N}명 등록${reg.size===N?'. 운영진이 매칭을 시작하면 확인할 수 있어.':''}`;
   const v=sel.value, isReg=v!==''&&reg.has(+v);
   $('mn-pw2-wrap').hidden=isReg||v==='';
-  $('mn-go').textContent=v===''?'이름을 골라줘':isReg?(S.started?'내 마니또 확인하기':'등록 확인하기'):'등록하기';
+  $('mn-pw').hidden=v==='';$('mn-pwlabel').hidden=v==='';
+  $('mn-go').textContent=v===''?'로그인하고 확인해줘':isReg?(S.started?'내 마니또 확인하기':'등록 확인하기'):'등록하기';
   $('mn-go').disabled=v===''||!loaded;
-  $('mn-pwlabel').textContent=isReg?'비밀번호':'비밀번호 정하기 (4자리 이상, 잊으면 운영진이 초기화해야 해)';
+  $('mn-pwlabel').textContent=isReg?'기존 마니또 비밀번호 (사이트 비밀번호와 별도)':'비밀번호 정하기 (4자리 이상, 잊으면 운영진이 초기화해야 해)';
   $('ad-start').textContent=S.started?'다시 섞기':'매칭 시작';
   $('ad-start').disabled=!(reg.size===N);
 }
@@ -910,7 +1004,7 @@ sel.addEventListener('change',()=>{msg('mn-msg','');$('m-show').hidden=true;rend
 
 $('mn-go').addEventListener('click',async()=>{
   const v=sel.value;if(v==='')return;
-  const i=+v, pw=$('mn-pw').value, isReg=S.registered.includes(i);
+  const i=+v, authEpoch=A.epoch, pw=$('mn-pw').value, isReg=S.registered.includes(i);
   if(!C){msg('mn-msg','이 브라우저에서는 안 돼. 크롬이나 사파리로 열어줘.','bad');return}
   if(pw.length<4){msg('mn-msg','비밀번호는 4자리 이상이야.','bad');return}
   $('mn-go').disabled=true;
@@ -939,13 +1033,14 @@ $('mn-go').addEventListener('click',async()=>{
       const ep=await C.importKey('raw',b64.dec(r.eph),EC,false,[]);
       const k=await C.deriveKey({name:'ECDH',public:ep},pk,{name:'AES-GCM',length:256},false,['decrypt']);
       const t=new Uint8Array(await C.decrypt({name:'AES-GCM',iv:b64.dec(r.iv2),additionalData:new Uint8Array([i])},k,b64.dec(r.ct)))[0];
+      if(A.identity()!==i||A.epoch!==authEpoch)return;
       msg('mn-msg','');
       $('r-who').textContent=NAMES[t];$('m-show').hidden=false;
       const c=$('r-card');c.classList.remove('pop');void c.offsetWidth;c.classList.add('pop');
     }
   }catch(e){
     const c=e.code;
-    const M={taken:'이미 등록된 이름이야. 본인인데 비밀번호가 기억 안 나면 운영진에게 초기화를 부탁해.',badpin:'비밀번호가 맞지 않아.'+(e.data&&e.data.left!=null?` (남은 시도 ${e.data.left}번)`:''),locked:'비밀번호를 너무 많이 틀렸어. 운영진에게 초기화를 부탁해.',notreg:'아직 등록되지 않은 이름이야.',noapi:'아직 서버가 연결되지 않았어.'};
+    const M={auth_required:'사이트에 먼저 로그인해줘.',auth_change_required:'사이트 비밀번호를 먼저 변경해줘.',auth_changed:'로그인 정보가 바뀌었어. 다시 확인해줘.',taken:'이미 등록된 이름이야. 본인인데 비밀번호가 기억 안 나면 운영진에게 초기화를 부탁해.',badpin:'비밀번호가 맞지 않아.'+(e.data&&e.data.left!=null?` (남은 시도 ${e.data.left}번)`:''),locked:'비밀번호를 너무 많이 틀렸어. 운영진에게 초기화를 부탁해.',notreg:'아직 등록되지 않은 이름이야.',noapi:'아직 서버가 연결되지 않았어.'};
     msg('mn-msg',M[c]||'문제가 생겼어. 잠시 후 다시 해줘.','bad');
     refresh();
   }finally{$('mn-go').disabled=false;renderManito()}
@@ -990,7 +1085,14 @@ function applyHash(){$('m-admin').hidden=location.hash!=='#admin';if(location.ha
 window.addEventListener('hashchange',applyHash);applyHash();
 
 /* ---------- load & poll ---------- */
-function renderAll(){renderBoard();renderArrivals();renderManito();renderAcks()}
+function renderAll(){
+  renderBoard();renderArrivals();renderManito();renderAcks();
+  const i=A.identity();if(i!==null&&loaded){
+    const tasks=S.board.tasks.filter(t=>!t.id.startsWith('ack-')&&t.people.includes(i)).map(t=>t.title);
+    A.summary('todo',tasks.length?'내 할 일: '+tasks.join(' · '):'내 할 일 고르기',i);
+    A.summary('bring','준비물 확인 '+ACKS.filter(([id])=>S.board.tasks.find(t=>t.id===id)?.people.includes(i)).length+'/2',i);
+  }
+}
 let refreshing=false, firstState=window.GJ_BOARD_INITIAL;
 function loadStatus(mode){
   ['board','arrival'].forEach(kind=>{
@@ -1017,13 +1119,17 @@ async function refresh(){
   finally{clearTimeout(slow);refreshing=false}
 }
 document.querySelectorAll('.load-retry').forEach(b=>b.addEventListener('click',refresh));
+A.subscribe(()=>{sel.value=A.identity()===null?'':String(A.identity());selected=A.identity();arrivalSelected=A.identity();colorOpen=null;armed=null;
+  $('m-show').hidden=true;$('r-who').textContent='';$('mn-pw').value='';$('mn-pw2').value='';msg('mn-msg','');
+  renderAll();ensureAcks();});
 renderAll();refresh();
 setInterval(()=>{if(document.visibilityState==='visible')refresh()},20000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
 })();
 </script>
-<script src="raffle.js?v=20261023-2"></script>
-<script src="vote.js?v=20261028-2"></script>
-<script src="quiz.js?v=20261028-1"></script>
+<script src="raffle.js?v=20261029-auth1"></script>
+<script src="vote.js?v=20261029-auth1"></script>
+<script src="third.js?v=20261029-auth1"></script>
+<script src="quiz.js?v=20261029-auth1"></script>
 </body>
 </html>

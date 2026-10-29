@@ -1,0 +1,13 @@
+[hidden]{display:none!important}
+.account-nav{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:12px;z-index:30}
+.account-nav button{font-family:var(--kr);font-size:14px;color:var(--paper-ink);background:var(--candy);border:2px solid var(--line);border-radius:20px;padding:8px 13px;box-shadow:3px 3px 0 var(--line);cursor:pointer;max-width:65vw}
+#account{scroll-margin-top:75px}.auth-card{padding:22px}.auth-card h3{font-size:24px;margin:0 0 8px}.auth-card p{line-height:1.7}
+.auth-card label,#auth-admin label{display:block;margin:12px 0 6px;font-family:var(--kr)}
+.auth-card input:not([type=checkbox]),.auth-card select,#auth-admin input:not([type=checkbox]),#auth-admin select{width:100%;font:16px var(--body);padding:12px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--paper-ink)}
+.auth-card .auth-check,#auth-admin .auth-check{display:flex;gap:9px;align-items:center;font:14px var(--body);line-height:1.5}
+.auth-check input{width:18px;height:18px;flex-shrink:0;accent-color:#7A4FD0}.auth-card .btn{margin:10px 6px 0 0}.auth-card .auth-note{font-size:13px;color:var(--paper-soft)}
+.auth-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:16px 0}.auth-summary a{color:var(--paper-ink);background:#F1E7FF;border:2px solid var(--line);border-radius:10px;padding:10px;font:14px var(--kr);text-decoration:none;overflow-wrap:anywhere;line-height:1.5}
+.auth-summary a:hover{background:var(--candy)}.auth-card details{border-top:2px dashed var(--line);margin-top:16px;padding-top:12px}.auth-card summary{cursor:pointer;font-family:var(--kr)}
+.auth-identity{font-family:var(--kr);margin:10px 0;color:var(--paper-ink)}.auth-identity .btn{margin:0}.auth-link{display:inline-block;border:0;background:none;text-decoration:underline;font:14px var(--body);color:var(--paper-ink);cursor:pointer;padding:10px 0}
+#auth-admin{border-top:2px dashed var(--line);padding-top:16px;margin-top:16px}.auth-locked-note{font:14px var(--body);line-height:1.7}.ackchip:disabled{opacity:1;cursor:default}.auth-summary[hidden],.auth-card [hidden],#auth-admin[hidden],.auth-identity[hidden]{display:none!important}
+@media(max-width:360px){.auth-card{padding:16px}.auth-summary{grid-template-columns:1fr}}

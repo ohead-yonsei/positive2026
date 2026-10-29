@@ -6,19 +6,19 @@ const $=id=>document.getElementById(id),API=(window.GJ_API||'').trim();
 const name=$('quiz-name'),STATUS='quiz-status';
 let state=null,online=false,loading=false,busy=false,timer=null,visible=true,answer=[],questionKey='',paintKey='';
 let adminPw='',draft=[],dirty=false,editing=-1,demo=true,confirmation=null,voteState=null;
-const identity=()=>name.value===''?null:Number(name.value);
+const A=window.GJ_AUTH;
+const identity=()=>A.identity();
 const mine=()=>state?.mine?.i===identity()?state.mine:null;
 const adminMode=()=>location.hash==='#admin';
 const editable=()=>!!adminPw&&state&&['closed','finished'].includes(state.phase)&&!busy;
 const canAnswer=()=>online&&!busy&&state?.phase==='question'&&mine()?.joined&&!mine()?.answered;
 const node=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e};
 function message(id,text,bad=false){$(id).textContent=text;$(id).className='msg'+(bad?' bad':'')}
-function errorText(e){return {badpw:'운영진 비밀번호가 맞지 않아.',quiz_stale:'진행 상황이 바뀌었어. 최신 내용을 확인한 뒤 다시 눌러줘.',quiz_running:'게임 중에는 문제를 바꿀 수 없어.',quiz_phase:'지금 단계에서는 진행할 수 없어. 새로고침해서 확인해줘.',no_players:'먼저 참가자가 한 명 이상 입장해야 해.',bad_questions:'문제와 정답을 확인해줘. 빈 보기·중복 보기 없이 최대 20문제까지 저장할 수 있어.',not_joined:'내 이름으로 먼저 입장해줘.',answer_closed:'답안 제출이 마감됐어. 다음 문제를 기다려줘.',quiz_closed:'지금은 입장할 수 없어.',bad_answer:'답안을 모두 골라줘.',bad_identity:'내 이름을 다시 골라줘.'}[e.message]||'연결을 확인하지 못했어. 다시 연결해줘. 이미 저장된 답안은 중복 처리하지 않아.'}
+function errorText(e){if((e.code||e.message).startsWith('auth_'))return A.errorText(e);return {badpw:'운영진 비밀번호가 맞지 않아.',quiz_stale:'진행 상황이 바뀌었어. 최신 내용을 확인한 뒤 다시 눌러줘.',quiz_running:'게임 중에는 문제를 바꿀 수 없어.',quiz_phase:'지금 단계에서는 진행할 수 없어. 새로고침해서 확인해줘.',no_players:'먼저 참가자가 한 명 이상 입장해야 해.',bad_questions:'문제와 정답을 확인해줘. 빈 보기·중복 보기 없이 최대 20문제까지 저장할 수 있어.',not_joined:'내 이름으로 먼저 입장해줘.',answer_closed:'답안 제출이 마감됐어. 다음 문제를 기다려줘.',quiz_closed:'지금은 입장할 수 없어.',bad_answer:'답안을 모두 골라줘.',bad_identity:'내 이름을 다시 골라줘.'}[e.message]||'연결을 확인하지 못했어. 다시 연결해줘. 이미 저장된 답안은 중복 처리하지 않아.'}
 async function call(op,values={}){
-  if(!/^https:\/\/script\.google\.com\//.test(API))throw Error('noapi');
-  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),20000);
-  try{const r=await fetch(API,{method:'POST',body:JSON.stringify({a:'gift',op,...(identity()===null?{}:{i:identity()}),...values}),signal:controller.signal});if(!r.ok)throw Error('network');const j=await r.json();if(!j.ok)throw Error(j.err||'network');return j}finally{clearTimeout(timeout)}
+  return A.request({a:'gift',op,...(identity()===null?{}:{i:identity()}),...values},{required:['quizJoin','quizAnswer'].includes(op)});
 }
+
 function accept(j){
   if(j.version!==1||!Object.hasOwn(PHASES,j.phase)||!Array.isArray(j.joined))throw Error('bad_response');
   if(state&&(j.revision<state.revision||(j.revision===state.revision&&j.serverNow<state.serverNow)))return;
@@ -26,6 +26,7 @@ function accept(j){
   const key=[j.runId,j.round,identity()].join('/');
   if(questionKey!==key){questionKey=key;answer=j.question?.type==='order'?j.question.options.map(o=>o.id):[];paintKey=''}
   if(mine()?.answered)answer=mine().answer.slice();
+  if(identity()!==null)A.summary('quiz',j.phase==='finished'?(j.ranking.find(r=>r.i===identity())?.score??0)+'점 · 퀴즈 결과':mine()?.joined?'퀴즈 참여 중':'퀴즈 '+PHASES[j.phase],identity());
   render();
 }
 function renderQuestion(){
@@ -61,10 +62,10 @@ function render(){
   const phase=state?.phase||'closed',m=mine(),joined=!!m?.joined;
   $('quiz-phase').textContent=state?PHASES[phase]:'연결 중…';
   $('quiz-count').textContent=state?phase==='question'||phase==='reveal'?`${state.answeredCount} / ${state.joined.length}명 제출`:`${state.joined.length} / 11명 입장`:'';
-  $('quiz-title').textContent=phase==='closed'?'운영진이 시작하면 열려!':phase==='lobby'?'이름을 고르고 입장해줘':phase==='finished'?'우리의 퀴즈왕은? 🏆':joined?`${state.round+1}. ${state.question.prompt}`:'내 이름으로 입장하고 함께 풀어봐!';
+  $('quiz-title').textContent=phase==='closed'?'운영진이 시작하면 열려!':phase==='lobby'?'로그인하고 입장해줘':phase==='finished'?'우리의 퀴즈왕은? 🏆':joined?`${state.round+1}. ${state.question.prompt}`:'내 이름으로 입장하고 함께 풀어봐!';
   $('quiz-intro').hidden=['question','reveal','finished'].includes(phase);
   $('quiz-entry').hidden=['closed','finished'].includes(phase);
-  name.disabled=busy||!online;
+  name.disabled=true;
   $('quiz-join').hidden=joined;$('quiz-join').disabled=busy||!online||identity()===null;
   const people=$('quiz-people');people.replaceChildren();people.hidden=phase!=='lobby';
   if(state&&phase==='lobby')state.joined.forEach(i=>people.append(node('li',null,NAMES[i])));
@@ -91,16 +92,16 @@ function render(){
 }
 function normalStatus(){
   if(!state)return;
-  message(STATUS,state.phase==='closed'?'아직 시작 전이야. 운영진이 퀴즈를 열면 여기에서 참여할 수 있어.':state.phase==='lobby'?mine()?.joined?'입장 완료! 첫 문제가 시작되면 자동으로 보여줄게.':'내 이름을 고르고 입장해줘.':state.phase==='question'?mine()?.answered?'답안을 제출했어! 운영진의 정답 공개를 기다려줘.':mine()?.joined?'문제 진행 중! 답안을 골라 제출해줘.':'내 이름으로 입장하면 현재 문제부터 풀 수 있어.':state.phase==='reveal'?'정답 공개! 다음 단계도 자동으로 이어져.':'퀴즈 끝! 함께해줘서 고마워 🎉');
+  message(STATUS,state.phase==='closed'?'아직 시작 전이야. 운영진이 퀴즈를 열면 여기에서 참여할 수 있어.':state.phase==='lobby'?mine()?.joined?'입장 완료! 첫 문제가 시작되면 자동으로 보여줄게.':'내 로그인하고 입장해줘.':state.phase==='question'?mine()?.answered?'답안을 제출했어! 운영진의 정답 공개를 기다려줘.':mine()?.joined?'문제 진행 중! 답안을 골라 제출해줘.':'내 이름으로 입장하면 현재 문제부터 풀 수 있어.':state.phase==='reveal'?'정답 공개! 다음 단계도 자동으로 이어져.':'퀴즈 끝! 함께해줘서 고마워 🎉');
 }
 function schedule(){clearTimeout(timer);const active=state&&['lobby','question','reveal'].includes(state.phase);timer=setTimeout(()=>load(),active&&(visible||adminMode()||mine()?.joined)?2500:15000)}
 async function load(){
   if(loading||busy){schedule();return}
   if(document.visibilityState!=='visible'){schedule();return}
-  loading=true;render();const who=identity();
+  loading=true;render();const who=identity(),authEpoch=A.epoch;
   try{accept(await call('quizStatus'));normalStatus()}
   catch(e){online=false;message(STATUS,errorText(e),true)}
-  finally{loading=false;render();if(who!==identity())load();else schedule()}
+  finally{loading=false;render();if(who!==identity()||authEpoch!==A.epoch)load();else schedule()}
 }
 async function mutate(op,values){
   if(busy)return;busy=true;render();message(STATUS,'저장 중이야. 잠깐만 기다려줘.');
@@ -109,7 +110,8 @@ async function mutate(op,values){
   finally{busy=false;render();schedule()}
 }
 name.append(new Option('내 이름 선택',''));NAMES.forEach((n,i)=>name.append(new Option(n,String(i))));
-try{const n=localStorage.getItem('gj26-quiz-name');if(n!==null&&/^(?:[0-9]|10)$/.test(n))name.value=n}catch(e){}
+A.bindIdentity(name);
+
 name.addEventListener('change',()=>{answer=[];questionKey='';paintKey='';try{localStorage.setItem('gj26-quiz-name',name.value)}catch(e){}render();load()});
 $('quiz-join').addEventListener('click',()=>{if(identity()!==null&&state&&!busy)mutate('quizJoin',{i:identity(),runId:state.runId})});
 $('quiz-submit').addEventListener('click',()=>{if(canAnswer()&&answer.length)mutate('quizAnswer',{i:identity(),runId:state.runId,round:state.round,answer:answer.slice()})});
@@ -163,7 +165,7 @@ async function adminLoad(password=adminPw){
   if(busy)return;if(!password){message('qa-status','운영진 비밀번호를 입력해줘.',true);return}
   busy=true;render();message('qa-status','운영진 정보를 불러오는 중…');
   try{
-    const j=await call('quizAdmin',{pw:password});adminPw=password;$('qa-pw').value='';
+    const j=await call('quizAdmin',{pw:password});adminPw=password;$('qa-pw').value='';window.GJ_THIRD_ADMIN?.connect(password);window.GJ_AUTH_ADMIN.connect(password);
     if(!dirty){draft=j.draft;demo=j.demo;resetEditor()}
     accept(j);renderDraft();
     try{voteState=await call('voteStatus')}catch(e){voteState=null}
@@ -185,7 +187,7 @@ async function adminAction(op,revision=state.revision){
 $('qa-auth').addEventListener('click',()=>adminLoad($('qa-pw').value));
 $('qa-pw').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();adminLoad($('qa-pw').value)}});
 $('qa-refresh').addEventListener('click',()=>adminLoad());
-function logout(){adminPw='';draft=[];dirty=false;voteState=null;clearConfirmation();$('qa-list').replaceChildren();resetEditor();$('qa-pw').value='';render();message('qa-status','운영진 연결을 해제했어.')}
+function logout(){adminPw='';draft=[];dirty=false;voteState=null;clearConfirmation();$('qa-list').replaceChildren();resetEditor();$('qa-pw').value='';window.GJ_THIRD_ADMIN?.disconnect();window.GJ_AUTH_ADMIN.disconnect();render();message('qa-status','운영진 연결을 해제했어.')}
 $('qa-logout').addEventListener('click',logout);
 $('qa-save').addEventListener('click',()=>adminAction('quizSave'));
 $('qa-vote-open').addEventListener('click',()=>confirmAction('voteReveal','지금 투표를 마감하고 결과를 공개할까? 공개 후에는 다시 숨기거나 투표할 수 없어.'));
@@ -199,6 +201,7 @@ $('qa-confirm-go').addEventListener('click',()=>{if(confirmation)adminAction(con
 $('qa-confirm-cancel').addEventListener('click',clearConfirmation);
 function hash(){ $('event-admin').hidden=!adminMode();if(!adminMode()&&adminPw)logout();if(adminMode())requestAnimationFrame(()=>$('event-admin').scrollIntoView({block:'start'})); }
 window.addEventListener('hashchange',hash);hash();resetEditor();
+A.subscribe(()=>{if(state)delete state.mine;answer=[];questionKey='';paintKey='';render();load()});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')load()});
 if('IntersectionObserver' in window)new IntersectionObserver(entries=>{const was=visible;visible=entries[0].isIntersecting;if(visible&&!was)load()},{rootMargin:'300px'}).observe($('quiz'));
 load();

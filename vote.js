@@ -8,7 +8,8 @@ const $=id=>document.getElementById(id), voter=$('vote-name');
 const choices=[0,1,2].map(i=>$('vote-choice-'+i));
 let state=null, online=false, loading=false, sending=false, review=null, anchor=0, retryAt=0, visible=true;
 const now=()=>state?state.serverNow+Math.max(0,performance.now()-anchor):Date.now();
-const identity=()=>voter.value===''?null:Number(voter.value);
+const A=window.GJ_AUTH;
+const identity=()=>A.identity();
 const hasVoted=()=>state&&state.submitted.includes(identity());
 const open=()=>online&&state&&state.phase==='open'&&now()<state.revealAt;
 function message(text,bad=false){$('vote-status').textContent=text;$('vote-status').className='msg'+(bad?' bad':'')}
@@ -16,21 +17,14 @@ function clearChoices(){choices.forEach(s=>s.value='');review=null}
 function apply(j){
   if(!Number.isFinite(j.serverNow)||!Number.isFinite(j.revealAt)||!Array.isArray(j.submitted)||!['open','revealed'].includes(j.phase))throw Error('bad_response');
   if(state&&(j.serverNow<state.serverNow||j.total<state.total))return;
-  state=j;anchor=performance.now();online=true;
+  state=j;if(identity()!==null)A.summary('vote',hasVoted()?'10주년 투표 완료':'10주년 투표 참여하기',identity());anchor=performance.now();online=true;
   if(hasVoted()||j.phase==='revealed')clearChoices();
   render();
 }
 async function call(op,values={}){
-  if(!API)throw Error('noapi');
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
-  try{
-    const params={a:'gift',op,...values};
-    const r=await fetch(op==='voteStatus'?API+'?'+new URLSearchParams({...params,t:Date.now()}):API,
-      op==='voteStatus'?{cache:'no-store',signal:controller.signal}:{method:'POST',body:JSON.stringify(params),signal:controller.signal});
-    if(!r.ok)throw Error('network');
-    const j=await r.json();if(!j.ok)throw Error(j.err||'network');return j;
-  }finally{clearTimeout(timer)}
+  return A.request({a:'gift',op,...values},{required:op==='voteSubmit'});
 }
+
 function results(){
   const root=$('vote-results');root.replaceChildren();
   if(state?.phase!=='revealed')return;
@@ -59,7 +53,7 @@ function render(){
   $('vote-done').textContent=done?NAMES[identity()]+'의 투표가 완료됐어! 공개 시간에 다시 만나 🏆':'';
   $('vote-fields').hidden=!!done||!!review;
   $('vote-confirm').hidden=!review||!!done;
-  voter.disabled=!online||sending||!!review;
+  voter.disabled=true;
   choices.forEach(s=>s.disabled=!can);
   $('vote-review').disabled=!can||choices.some(s=>s.value==='');
   $('vote-send').disabled=!can||!review;
@@ -89,11 +83,13 @@ async function load(){
   if(loading||sending)return;
   loading=true;$('vote-retry').disabled=true;$('vote-retry').textContent='불러오는 중…';
   if(!state)message('투표함을 불러오는 중이야…');
-  try{apply(await call('voteStatus'));message(state.phase==='revealed'?'10년의 긍정을 함께 축하해!':hasVoted()?'이미 제출한 이름이야. 브라우저가 바뀌어도 투표는 잘 보관돼 있어.':'내 이름을 고르고, 세 질문에 한 명씩 골라줘.')}
+  try{apply(await call('voteStatus'));message(state.phase==='revealed'?'10년의 긍정을 함께 축하해!':hasVoted()?'이미 제출한 이름이야. 브라우저가 바뀌어도 투표는 잘 보관돼 있어.':'로그인하고, 세 질문에 한 명씩 골라줘.')}
   catch(e){online=false;message(API?'연결이 늦어지고 있어. 현황 새로고침을 눌러 다시 확인해줘.':'아직 서버가 연결되지 않았어.',true)}
   finally{loading=false;render()}
 }
 [voter,...choices].forEach(s=>{s.append(new Option(s===voter?'투표하는 내 이름':'한 명 선택',''));NAMES.forEach((name,i)=>s.append(new Option(name,String(i))))});
+A.bindIdentity(voter);
+A.subscribe(()=>{clearChoices();render();load()});
 voter.addEventListener('change',()=>{clearChoices();message(hasVoted()?'이미 제출한 이름이야. 결과 공개를 기다려줘.':'본인 이름으로만 투표해줘.');render()});
 choices.forEach(s=>s.addEventListener('change',()=>{review=null;render()}));
 $('vote-form').addEventListener('submit',e=>{
@@ -114,7 +110,7 @@ $('vote-send').addEventListener('click',async()=>{
     message(j.alreadyVoted?'이미 제출한 투표가 보관돼 있어. 중복으로 집계하지 않았어.':'투표 완료! 10월 31일 밤 9시에 결과를 확인해줘.');
   }catch(e){
     online=false;
-    message(e.message==='vote_closed'?'투표가 마감됐어. 현황 새로고침을 눌러 결과를 확인해줘.':'저장 여부를 확인하지 못했어. 현황 새로고침으로 확인해줘. 이미 저장됐다면 다시 집계하지 않아.',true);
+    message((e.code||e.message).startsWith('auth_')?A.errorText(e):e.message==='vote_closed'?'투표가 마감됐어. 현황 새로고침을 눌러 결과를 확인해줘.':'저장 여부를 확인하지 못했어. 현황 새로고침으로 확인해줘. 이미 저장됐다면 다시 집계하지 않아.',true);
   }finally{sending=false;render()}
 });
 $('vote-retry').addEventListener('click',()=>load());
