@@ -35,6 +35,7 @@ window.GJ_BOARD_INITIAL=window.GJ_BOARD_REQUEST();
 <link rel="stylesheet" href="quiz.css?v=20261028-1">
 <link rel="stylesheet" href="third.css?v=20261029-1">
 <link rel="stylesheet" href="auth.css?v=20261029-1">
+<link rel="stylesheet" href="picker.css?v=20261030-1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Permanent+Marker&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -346,7 +347,7 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
   </div>
 </header>
 
-<nav class="account-nav" aria-label="내 계정"><button type="button" id="auth-jump">로그인 · 내 참여</button></nav>
+<nav class="account-nav" aria-label="바로가기"><button type="button" id="auth-jump">로그인 · 내 참여</button><a class="picker-shortcut" href="#picker">🎲 랜덤 뽑기</a></nav>
 <main class="wrap">
   <section id="account">
     <div class="sh"><h2>내 참여</h2><span class="tag">Hello, positive!</span></div>
@@ -525,6 +526,36 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
       <div id="third-reveal" class="third-reveal" hidden></div>
       <div id="third-finish" hidden><h4>오늘의 3등 예측 성공자 🥉</h4><p id="third-winners"></p><ol id="third-history" class="third-history"></ol></div>
       <p class="msg" id="third-status" role="status">질문함을 불러오는 중이야…</p><button class="btn ghosty" id="third-retry" type="button">다시 연결</button>
+    </div>
+  </section>
+
+  <section id="picker" aria-labelledby="picker-heading">
+    <div class="sh"><h2 id="picker-heading">랜덤 이름 뽑기 🎲</h2><span class="tag">Pick &amp; Play</span></div>
+    <p class="lede">누가 할까? 누구랑 할까? 필요할 때마다 여기서 뽑아봐.</p>
+    <div class="sticker picker-card">
+      <p class="picker-intro">로그인 없이 바로! 한 폰에서 뽑고 다 같이 확인해줘.</p>
+      <form id="picker-form">
+        <fieldset class="picker-modes">
+          <legend class="picker-sr">뽑기 방식</legend>
+          <label><input type="radio" name="picker-mode" id="picker-mode-people" value="people" checked><span>🙋 n명 뽑기</span></label>
+          <label><input type="radio" name="picker-mode" id="picker-mode-teams" value="teams"><span>🤝 n개 팀 나누기</span></label>
+        </fieldset>
+        <details class="picker-participants">
+          <summary><span id="picker-selected">참가자 11명</span><span class="picker-edit">명단 변경</span></summary>
+          <p class="picker-note">이번에 함께할 사람만 체크해줘.</p>
+          <div class="picker-selection"><button type="button" id="picker-all">모두 선택</button><button type="button" id="picker-none">모두 해제</button></div>
+          <div id="picker-people" class="picker-people" role="group" aria-label="뽑기 참가자"></div>
+        </details>
+        <div class="picker-count-row"><label for="picker-count" id="picker-count-label">몇 명을 뽑을까?</label><select id="picker-count" aria-describedby="picker-help" disabled><option value="1">1명</option></select></div>
+        <p class="picker-note" id="picker-help">같은 추첨 안에서는 이름이 겹치지 않아.</p>
+        <button class="btn picker-go" id="picker-go" type="submit" disabled>1명 뽑기 🎲</button>
+      </form>
+      <p class="picker-note picker-feedback" id="picker-feedback" role="status" aria-live="polite">뽑기를 준비하고 있어…</p>
+      <div id="picker-result" class="picker-result" role="region" aria-labelledby="picker-result-title" hidden>
+        <h3 id="picker-result-title"></h3><div id="picker-result-list"></div>
+        <p class="picker-note" id="picker-result-note"></p>
+      </div>
+      <noscript>랜덤 뽑기를 사용하려면 브라우저에서 자바스크립트를 켜줘.</noscript>
     </div>
   </section>
 
@@ -1131,5 +1162,6 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 <script src="vote.js?v=20261029-auth1"></script>
 <script src="third.js?v=20261029-auth1"></script>
 <script src="quiz.js?v=20261029-auth1"></script>
+<script src="picker.js?v=20261030-1"></script>
 </body>
 </html>
