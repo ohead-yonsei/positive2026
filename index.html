@@ -32,7 +32,7 @@ window.GJ_BOARD_INITIAL=window.GJ_BOARD_REQUEST();
 </script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="vote.css?v=20261028-2">
-<link rel="stylesheet" href="quiz.css?v=20261028-1">
+<link rel="stylesheet" href="quiz.css?v=20261030-1">
 <link rel="stylesheet" href="third.css?v=20261029-1">
 <link rel="stylesheet" href="auth.css?v=20261029-1">
 <link rel="stylesheet" href="picker.css?v=20261030-1">
@@ -125,6 +125,15 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .guests li{font-family:var(--kr);font-size:16px;background:var(--paper);color:var(--paper-ink);border:2.5px solid var(--line);border-radius:999px;padding:3px 13px 1px;box-shadow:2px 3px 0 var(--line)}
 .guests li:nth-child(3n){transform:rotate(-3deg)}.guests li:nth-child(3n+1){transform:rotate(2deg)}
 .guests li:nth-child(4n){background:var(--candy)}.guests li:nth-child(5n){background:var(--slime)}
+.guests li.guest-in-spirit{background:#FFE1D7;display:inline-flex;align-items:center;gap:5px}
+.guest-in-spirit span{font-size:13px}
+.miss-you{position:relative;margin:32px 0 8px;padding:24px 20px 20px;background:#FFE1D7;color:var(--paper-ink);border:3px solid var(--line);border-radius:20px;box-shadow:5px 6px 0 var(--line);text-align:left;word-break:keep-all}
+.miss-you::before{content:"";position:absolute;top:-12px;left:28px;width:76px;height:22px;border:2px solid var(--line);background:var(--candy);transform:rotate(-6deg)}
+.miss-you .miss-you-to{margin:0 0 8px;font:17px var(--marker)}
+.miss-you h2{max-width:calc(100% - 68px);font:clamp(21px,6.9vw,27px)/1.35 var(--kr);font-weight:400;margin:0 0 14px;overflow-wrap:anywhere}
+.miss-you p{font-size:15px;line-height:1.8;margin:0 0 16px}
+.miss-you .miss-you-ghost{position:absolute;right:17px;top:23px;width:65px;height:76px;transform:rotate(7deg)}
+.miss-you .miss-you-sign{margin:0;padding-top:13px;border-top:2px dashed #BF8D7D;font:18px/1.6 var(--kr)}
 
 /* ---------- sections ---------- */
 section{padding:50px 0 6px}
@@ -342,8 +351,22 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
     </div>
 
     <ul class="guests" aria-label="초대된 사람">
-      <li>구세라</li><li>권경지</li><li>권순록</li><li>김강일</li><li>류원선</li><li>박재훈</li><li>서정윤</li><li>유세종</li><li>이대호</li><li>이수한</li><li>천수진</li>
+      <li>구세라</li><li>권경지</li><li>권순록</li><li class="guest-in-spirit">김강일 <span aria-label="올해는 마음으로 함께">💛</span></li><li>류원선</li><li>박재훈</li><li>서정윤</li><li>유세종</li><li>이대호</li><li>이수한</li><li>천수진</li>
     </ul>
+    <aside class="miss-you" aria-labelledby="miss-you-title">
+      <p class="miss-you-to">TO. 강일 💌</p>
+      <svg class="miss-you-ghost" viewBox="0 0 70 82" aria-hidden="true" focusable="false">
+        <path d="M10 70V31a25 25 0 0 1 50 0v39l-9-6-8 7-8-7-8 7-8-7z" fill="#FFF7EA" stroke="#0E0818" stroke-width="3" stroke-linejoin="round"/>
+        <path d="m22 33 7-3m12 0 7 3" fill="none" stroke="#0E0818" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="26" cy="39" r="2.7" fill="#0E0818"/><circle cx="44" cy="39" r="2.7" fill="#0E0818"/>
+        <ellipse cx="19" cy="46" rx="5" ry="3" fill="#F89CA2"/><ellipse cx="51" cy="46" rx="5" ry="3" fill="#F89CA2"/>
+        <path d="M30 52q5-5 10 0" fill="none" stroke="#0E0818" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M46 43q-7 10 0 10t0-10" fill="#91D7F0" stroke="#0E0818" stroke-width="1.5"/>
+      </svg>
+      <h2 id="miss-you-title">강일 없는 긍정의밤이라니… ㅠㅠ</h2>
+      <p>이번엔 함께 못해서 너무 아쉽다.<br>벌써부터 네 빈자리가 느껴져.<br>다음엔 꼭 같이 먹고, 웃고, 놀자!</p>
+      <p class="miss-you-sign">이번엔 10명이 모여도,<br>우리의 긍정은 언제나 11명 💛</p>
+    </aside>
   </div>
 </header>
 
@@ -484,6 +507,12 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
       <div class="quiz-top"><span id="quiz-phase" class="quiz-pill">연결 중…</span><span id="quiz-count" class="quiz-note"></span></div>
       <h3 id="quiz-title" class="quiz-title">운영진이 시작하면 열려!</h3>
       <p id="quiz-intro" class="quiz-note">O/X · 4지선다 · 순서 맞히기<br>문제당 10점, 최종 점수로 순위를 매겨. 동점은 공동 순위!</p>
+      <details class="quiz-data-note">
+        <summary>약 5년치 카톡으로 만든 퀴즈 📊</summary>
+        <p>2021.09.17–2026.10.28의 대화 기록을 바탕으로, 추억 문제와 카톡 통계 문제를 섞었어. 통계는 긍정 친구 11명 기준이야.</p>
+        <p>메시지 수는 보낸 말풍선 1개를 1건으로 세고, 웃음·사진·이모티콘도 포함해. 말버릇·단어 문제는 ㅋ·ㅎ, 기호, 링크, 첨부 표시를 빼고 비교했어.</p>
+        <p>단독 표현은 메시지 전체가 같은 경우, 단어는 그 단어가 등장한 메시지 수를 세었어. 다른 철자는 따로 집계했고, 자세한 기준과 횟수는 정답 공개 때 알려줄게!</p>
+      </details>
       <div id="quiz-entry" hidden>
         <label for="quiz-name">참여할 내 이름</label>
         <select id="quiz-name" disabled></select>

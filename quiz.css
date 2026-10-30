@@ -4,6 +4,9 @@
 .quiz-pill{font:15px var(--kr);padding:4px 10px;border:2px solid var(--line);border-radius:99px;background:#EADFF5}
 .quiz-title{font:26px/1.4 var(--kr);margin:18px 0 12px;word-break:keep-all}
 .quiz-note{font-size:14px;color:var(--paper-soft);word-break:keep-all;margin:10px 0}
+.quiz-data-note{margin:14px 0;padding:12px 14px;border:2px dashed #CABEA8;border-radius:12px;background:#FFF1C4;font-size:13px;line-height:1.7;word-break:keep-all}
+.quiz-data-note summary{font:16px/1.5 var(--kr);cursor:pointer}
+.quiz-data-note p{margin:10px 0 0;color:var(--paper-soft)}
 .quiz-people{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:12px 0}
 .quiz-people li{font:14px var(--kr);background:#E6F1CF;border:2px solid var(--line);border-radius:99px;padding:4px 9px}
 .quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
