@@ -1,0 +1,21 @@
+.guests li.guest-in-spirit{background:#FFE1D7;padding:0}
+.guest-in-spirit button{display:inline-flex;align-items:center;gap:5px;min-height:36px;padding:3px 13px 1px;border:0;border-radius:inherit;background:none;color:inherit;font:inherit;cursor:pointer}
+.guest-in-spirit span{font-size:13px}
+.kangil-egg{cursor:pointer;color:var(--paper-ink);font-family:inherit}
+.kangil-spark,.kangil-footer{border:0;background:none;min-width:44px;min-height:44px;padding:6px;font-size:22px;line-height:1;vertical-align:middle;cursor:pointer}
+.kangil-footer{display:block;margin:12px auto 0;font-size:18px}
+.kangil-egg:active,.kangil-spark:active,.kangil-footer:active{transform:rotate(-8deg)}
+.kangil-dialog:not([open]){display:none}
+.kangil-dialog{width:420px;max-width:calc(100% - 20px);max-height:calc(100dvh - 28px);margin:auto;padding:14px 8px 10px;border:0;background:transparent;overflow:auto;overscroll-behavior:contain;color:var(--paper-ink)}
+.kangil-dialog::backdrop{background:rgba(14,8,24,.68)}
+html.kangil-open,html.kangil-open body{overflow:hidden}
+.miss-you{position:relative;padding:24px 20px 20px;background:#FFE1D7;color:var(--paper-ink);border:3px solid var(--line);border-radius:20px;box-shadow:5px 6px 0 var(--line);text-align:left;word-break:keep-all}
+.miss-you::before{content:"";position:absolute;top:-12px;left:28px;width:76px;height:22px;border:2px solid var(--line);background:var(--candy);transform:rotate(-6deg)}
+.miss-you .miss-you-to{margin:0 0 8px;font:17px var(--marker)}
+.miss-you h2{max-width:calc(100% - 68px);font:clamp(21px,6.9vw,27px)/1.35 var(--kr);font-weight:400;margin:0 0 14px;overflow-wrap:anywhere}
+.miss-you p{font-size:15px;line-height:1.8;margin:0 0 16px;white-space:pre-line}
+.miss-you .miss-you-ghost{position:absolute;right:17px;top:23px;width:65px;height:76px;transform:rotate(7deg)}
+.miss-you .miss-you-sign{margin:0;padding-top:13px;border-top:2px dashed #BF8D7D;font:18px/1.6 var(--kr)}
+.miss-you .kangil-hint{font-size:12px;margin:16px 0 10px;color:var(--paper-soft)}
+.kangil-close{width:100%;min-height:44px;padding:9px 14px;border:2px solid var(--line);border-radius:12px;background:var(--paper);color:var(--paper-ink);font:17px var(--kr);cursor:pointer}
+.kangil-dialog :focus-visible{outline:3px solid #7F409C;outline-offset:3px}
