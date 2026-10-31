@@ -30,3 +30,14 @@
 .vote-ranking b{text-align:right;font-weight:400}
 #vote-status{word-break:keep-all}
 @media(max-width:360px){.vote-card{padding:16px}.vote-question{padding:12px}.vote-question label,.vote-question h3{font-size:18px}}
+
+.revote{border-top:3px dashed var(--line);margin-top:24px;padding-top:20px;scroll-margin-top:24px}
+.revote h3{font:24px var(--kr);margin:0}
+.revote .vote-date{white-space:pre-wrap;overflow-wrap:anywhere}
+.revote select{margin:10px 0}
+.vote-archive{margin:14px 0;padding:12px;border:2px dashed #B5A9BC;border-radius:14px}
+.vote-archive summary{cursor:pointer;font:18px var(--kr)}
+.vote-archive .vote-question{background:#EADFF5}
+#rv-admin [hidden]{display:none!important}
+#rv-admin textarea{display:block;box-sizing:border-box;width:100%;margin:10px 0;resize:vertical;font:16px/1.6 var(--body);padding:12px;border:2px solid var(--line);border-radius:12px;color:var(--paper-ink);background:var(--paper)}
+#rv-admin-summary,#rv-admin-confirm-text,#rv-review-text{white-space:pre-wrap;overflow-wrap:anywhere}

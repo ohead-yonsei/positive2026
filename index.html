@@ -31,7 +31,7 @@ window.GJ_BOARD_REQUEST=function(){
 window.GJ_BOARD_INITIAL=window.GJ_BOARD_REQUEST();
 </script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="vote.css?v=20261028-2">
+<link rel="stylesheet" href="vote.css?v=20261031-revote1">
 <link rel="stylesheet" href="quiz.css?v=20261030-1">
 <link rel="stylesheet" href="kangil.css?v=20261030-1">
 <link rel="stylesheet" href="third.css?v=20261029-1">
@@ -473,6 +473,26 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
         </form>
       </div>
       <div id="vote-results" hidden></div>
+      <div id="revote" class="revote" hidden>
+        <div class="vote-top"><h3>3번 다시 투표하기 🗳️</h3><span class="vote-total" id="rv-total"></span></div>
+        <p id="rv-prompt" class="vote-date">새 질문을 기다리고 있어!</p>
+        <p id="rv-info" class="vote-note">새 질문이 정해지면 운영진이 재투표를 열어줄게.</p>
+        <button id="rv-login" class="btn ghosty" type="button" hidden>로그인하고 참여하기</button>
+        <form id="rv-form" hidden>
+          <label for="rv-choice" id="rv-who"></label>
+          <select id="rv-choice" required disabled></select>
+          <button id="rv-review" class="btn" type="submit" disabled>선택 내용 확인</button>
+          <div id="rv-confirm" class="vote-confirm" hidden>
+            <p id="rv-review-text"></p><p class="vote-note">한 번 제출하면 바꿀 수 없어.</p>
+            <button id="rv-send" class="btn" type="button">이대로 재투표하기</button>
+            <button id="rv-edit" class="btn ghosty" type="button">다시 고르기</button>
+          </div>
+        </form>
+        <p id="rv-done" class="vote-done" hidden></p>
+        <div id="rv-results" hidden></div>
+        <p id="rv-status" class="msg" role="status"></p>
+        <button id="rv-refresh" class="btn ghosty" type="button">재투표 현황 새로고침</button>
+      </div>
       <p class="msg" id="vote-status" role="status">투표함을 불러오는 중이야…</p>
       <button class="btn ghosty" id="vote-retry" type="button">현황 새로고침</button>
       <p class="vote-note">운영진이 현장에서 먼저 공개할 수도 있어.<br>공개 전에는 득표수와 순위를 볼 수 없어.<br>공개 후에도 누가 누구를 뽑았는지는 표시하지 않아.</p>
@@ -608,6 +628,25 @@ footer img{width:170px;height:auto;display:block;margin:0 auto 10px;transform:ro
           <h3>투표 결과 공개</h3><p class="quiz-note" id="qa-vote-state">투표 현황을 확인하는 중…</p>
           <button class="btn" id="qa-vote-open" type="button">투표 마감 · 결과 미리 공개</button>
           <p class="quiz-note">공개하면 투표가 즉시 마감되고 다시 숨길 수 없어. 미리 공개하지 않으면 10월 31일 밤 9시에 자동 공개돼.</p>
+        </div>
+        <div class="quiz-admin-section" id="rv-admin">
+          <h3>3번 재투표</h3>
+          <p class="quiz-note">1·2번 결과와 기존 3번 투표 기록은 보관돼. 새 질문으로 3번만 다시 투표해.</p>
+          <p id="rv-admin-summary" class="quiz-admin-summary">운영진 연결을 기다리는 중…</p>
+          <div id="rv-admin-fields">
+            <label for="rv-admin-prompt">새 3번 질문</label>
+            <textarea id="rv-admin-prompt" rows="3" minlength="5" maxlength="180" placeholder="세라가 정한 새 질문을 입력해줘"></textarea>
+            <button id="rv-admin-open" class="btn" type="button" disabled>새 질문으로 재투표 열기</button>
+          </div>
+          <button id="rv-admin-reveal" class="btn" type="button" hidden>재투표 마감 · 결과 공개</button>
+          <div id="rv-admin-confirm" class="quiz-admin-confirm" hidden>
+            <p id="rv-admin-confirm-text"></p>
+            <button id="rv-admin-go" class="btn" type="button">진행하기</button>
+            <button id="rv-admin-cancel" class="btn ghosty" type="button">취소</button>
+          </div>
+          <button id="rv-admin-refresh" class="btn ghosty" type="button">재투표 현황 새로고침</button>
+          <p id="rv-admin-status" class="msg" role="status"></p>
+          <p class="quiz-note">열면 질문을 바꿀 수 없어. 재투표는 시간에 관계없이 운영진이 마감할 때 결과가 공개돼.</p>
         </div>
         <div class="quiz-admin-section">
           <h3>퀴즈 진행</h3><p id="qa-summary" class="quiz-admin-summary"></p>
@@ -1187,9 +1226,10 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 })();
 </script>
 <script src="raffle.js?v=20261029-auth1"></script>
-<script src="vote.js?v=20261029-auth1"></script>
+<script src="revote.js?v=20261031-revote1"></script>
+<script src="vote.js?v=20261031-revote1"></script>
 <script src="third.js?v=20261029-auth1"></script>
-<script src="quiz.js?v=20261029-auth1"></script>
+<script src="quiz.js?v=20261031-revote1"></script>
 <script src="picker.js?v=20261030-1"></script>
 <script src="kangil.js?v=20261030-1"></script>
 </body>

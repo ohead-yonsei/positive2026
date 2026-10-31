@@ -165,7 +165,7 @@ async function adminLoad(password=adminPw){
   if(busy)return;if(!password){message('qa-status','운영진 비밀번호를 입력해줘.',true);return}
   busy=true;render();message('qa-status','운영진 정보를 불러오는 중…');
   try{
-    const j=await call('quizAdmin',{pw:password});adminPw=password;$('qa-pw').value='';window.GJ_THIRD_ADMIN?.connect(password);window.GJ_AUTH_ADMIN.connect(password);
+    const j=await call('quizAdmin',{pw:password});adminPw=password;$('qa-pw').value='';window.GJ_THIRD_ADMIN?.connect(password);window.GJ_AUTH_ADMIN.connect(password);window.GJ_REVOTE_ADMIN?.connect(password);
     if(!dirty){draft=j.draft;demo=j.demo;resetEditor()}
     accept(j);renderDraft();
     try{voteState=await call('voteStatus')}catch(e){voteState=null}
@@ -187,7 +187,7 @@ async function adminAction(op,revision=state.revision){
 $('qa-auth').addEventListener('click',()=>adminLoad($('qa-pw').value));
 $('qa-pw').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();adminLoad($('qa-pw').value)}});
 $('qa-refresh').addEventListener('click',()=>adminLoad());
-function logout(){adminPw='';draft=[];dirty=false;voteState=null;clearConfirmation();$('qa-list').replaceChildren();resetEditor();$('qa-pw').value='';window.GJ_THIRD_ADMIN?.disconnect();window.GJ_AUTH_ADMIN.disconnect();render();message('qa-status','운영진 연결을 해제했어.')}
+function logout(){adminPw='';draft=[];dirty=false;voteState=null;clearConfirmation();$('qa-list').replaceChildren();resetEditor();$('qa-pw').value='';window.GJ_THIRD_ADMIN?.disconnect();window.GJ_AUTH_ADMIN.disconnect();window.GJ_REVOTE_ADMIN?.disconnect();render();message('qa-status','운영진 연결을 해제했어.')}
 $('qa-logout').addEventListener('click',logout);
 $('qa-save').addEventListener('click',()=>adminAction('quizSave'));
 $('qa-vote-open').addEventListener('click',()=>confirmAction('voteReveal','지금 투표를 마감하고 결과를 공개할까? 공개 후에는 다시 숨기거나 투표할 수 없어.'));

@@ -19,7 +19,7 @@ function apply(j){
   if(state&&(j.serverNow<state.serverNow||j.total<state.total))return;
   state=j;if(identity()!==null)A.summary('vote',hasVoted()?'10주년 투표 완료':'10주년 투표 참여하기',identity());anchor=performance.now();online=true;
   if(hasVoted()||j.phase==='revealed')clearChoices();
-  render();
+  render();window.GJ_REVOTE?.accept(j);
 }
 async function call(op,values={}){
   return A.request({a:'gift',op,...values},{required:op==='voteSubmit'});
@@ -40,7 +40,10 @@ function results(){
         const li=document.createElement('li'),name=document.createElement('span'),bar=document.createElement('span'),fill=document.createElement('span'),count=document.createElement('b');
         name.textContent=e.name;bar.className='vote-bar';bar.setAttribute('aria-hidden','true');fill.style.width=e.count/max*100+'%';bar.append(fill);count.textContent=e.count+'표';li.append(name,bar,count);list.append(li);
       });card.append(list);
-    }root.append(card);
+    }
+    if(k===2&&state.revote){
+      const archive=document.createElement('details'),summary=document.createElement('summary');archive.className='vote-archive';summary.textContent='3번 기존 투표 기록';archive.append(summary,card);root.append(archive);
+    }else root.append(card);
   });
 }
 function render(){
@@ -117,7 +120,8 @@ $('vote-retry').addEventListener('click',()=>load());
 document.addEventListener('gj-vote-revealed',e=>{apply(e.detail);message('투표가 마감됐어. 공개된 결과를 확인해봐!')});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')load()});
 if('IntersectionObserver' in window)new IntersectionObserver(entries=>{visible=entries[0].isIntersecting},{rootMargin:'200px'}).observe($('vote'));
+window.GJ_VOTE={accept:apply};
 setInterval(clock,1000);
-setInterval(()=>{if(visible&&document.visibilityState==='visible'&&state?.phase!=='revealed')load()},30000);
+setInterval(()=>{if(visible&&document.visibilityState==='visible')load()},30000);
 load();
 })();
