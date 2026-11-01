@@ -8,7 +8,7 @@ function client(random=crypto.webcrypto){
     append(...items){this.children.push(...items)}replaceChildren(...items){this.children=items}
     addEventListener(type,fn){this.events[type]=fn}fire(type){this.events[type]?.({preventDefault(){}})}
   }
-  for(const [,id]of fs.readFileSync('index.html','utf8').matchAll(/id="(picker[^"]*)"/g))elements[id]=new Element();
+  for(const [,id]of fs.readFileSync('tests/fixtures/event-dom-ids.txt','utf8').matchAll(/id="(picker[^"]*)"/g))elements[id]=new Element();
   const document={getElementById:id=>elements[id],createElement:tag=>new Element(tag)};
   // No login, fetch, storage or server globals: drawing must work independently.
   vm.runInNewContext(fs.readFileSync('picker.js','utf8'),{document,crypto:random,Uint32Array,Option:class extends Element{constructor(text,value){super('option');this.textContent=text;this.value=value}}});

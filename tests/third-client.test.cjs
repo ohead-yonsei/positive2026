@@ -9,7 +9,7 @@ function client(api){
   append(...x){this.children.push(...x)}replaceChildren(...x){this.children=x}focus(){}
   querySelectorAll(tag){return this.children.flatMap(c=>[...(c.tag===tag?[c]:[]),...(c.querySelectorAll?c.querySelectorAll(tag):[])])}
  }
- const ids=[...fs.readFileSync('index.html','utf8').matchAll(/id="(third[^"]*)"/g)].map(m=>m[1]);for(const id of ids)elements[id]=new Element();
+ const ids=[...fs.readFileSync('tests/fixtures/event-dom-ids.txt','utf8').matchAll(/id="(third[^"]*)"/g)].map(m=>m[1]);for(const id of ids)elements[id]=new Element();
  const document=new Element();Object.assign(document,{getElementById:id=>elements[id],createElement:tag=>new Element(tag),visibilityState:'visible'});
  let offline=false,loseResponse=false;const calls=[];const win={GJ_API:'https://script.google.com/test'};
  const context=vm.createContext({window:win,document,AbortController,Option:class extends Element{constructor(text,value){super('option');this.textContent=text;this.value=value}},setTimeout:()=>1,clearTimeout(){},

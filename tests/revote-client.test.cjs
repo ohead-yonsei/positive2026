@@ -9,7 +9,7 @@ function fixture(){
   append(...c){this.children.push(...c)}replaceChildren(...c){this.children=c}setAttribute(){}focus(){}
   addEventListener(e,f){(this.events[e]??=[]).push(f)}async fire(e){for(const f of this.events[e]||[])await f({preventDefault(){}})}
  }
- const ids=[...fs.readFileSync('index.html','utf8').matchAll(/id="((?:rv-|revote)[^"]*)"/g)].map(m=>m[1]),elements=Object.fromEntries(ids.map(i=>[i,new Element()]));
+ const ids=[...fs.readFileSync('tests/fixtures/event-dom-ids.txt','utf8').matchAll(/id="((?:rv-|revote)[^"]*)"/g)].map(m=>m[1]),elements=Object.fromEntries(ids.map(i=>[i,new Element()]));
  let lost=false,offline=false;
  const context=vm.createContext({window:{GJ_API:'https://example.test'},document:{getElementById:id=>elements[id],createElement:()=>new Element(),visibilityState:'visible'},Option:class{},setInterval(){},
   fetch:async(url,opts)=>{if(offline)throw Error('offline');const q=JSON.parse(opts.body),j=call(q);if(lost&&q.op==='voteSubmit'){lost=false;throw Error('lost')}return{json:async()=>j}}

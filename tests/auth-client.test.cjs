@@ -10,7 +10,7 @@ function client(api,{local=new Map(),blocked=false}={}){
   append(...x){this.children.push(...x)}replaceChildren(...x){this.children=x}focus(){}scrollIntoView(){}setAttribute(){}insertAdjacentElement(){}
   reset(){for(const key of ['auth-current','auth-new','auth-new-confirm'])elements[key].value=''}
  }
- const ids=[...fs.readFileSync('index.html','utf8').matchAll(/id="(auth[^"]*|account)"/g)].map(m=>m[1]);
+ const ids=[...fs.readFileSync('tests/fixtures/event-dom-ids.txt','utf8').matchAll(/id="(auth[^"]*|account)"/g)].map(m=>m[1]);
  const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));elements['auth-remember'].checked=true;
  const document=new Element();Object.assign(document,{getElementById:id=>elements[id],createElement:()=>new Element(),querySelector:()=>null});
  const window=new Element();window.GJ_API='https://script.google.com/test';

@@ -15,7 +15,7 @@ function client(api){
   setAttribute(k,v){this.attributes[k]=v}
   focus(){}
  }
- const ids=[...fs.readFileSync('index.html','utf8').matchAll(/id="(vote[^"]*)"/g)].map(m=>m[1]);
+ const ids=[...fs.readFileSync('tests/fixtures/event-dom-ids.txt','utf8').matchAll(/id="(vote[^"]*)"/g)].map(m=>m[1]);
  const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));
  const document=new Element();Object.assign(document,{getElementById:id=>elements[id],createElement:()=>new Element(),visibilityState:'visible'});
  let perf=0,offline=false,loseResponse=false;const intervals=[];

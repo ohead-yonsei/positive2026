@@ -5,7 +5,7 @@ function server(){
  return {call:q=>JSON.parse(JSON.stringify(ctx.raffleAction(q))),data};
 }
 function client(api,{local=new Map(),tab=new Map(),blocked=false}={}){
- const ids=[...fs.readFileSync('index.html','utf8').matchAll(/id="([^"]+)"/g)].map(m=>m[1]);
+ const ids=[...fs.readFileSync('tests/fixtures/event-dom-ids.txt','utf8').matchAll(/id="([^"]+)"/g)].map(m=>m[1]);
  class Element{
   constructor(){this.value='';this.textContent='';this.hidden=false;this.style={};this.children=[];this.events={};this.disabled=false}
   addEventListener(e,f){(this.events[e]??=[]).push(f)}
